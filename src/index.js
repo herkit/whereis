@@ -23,6 +23,10 @@ tracker.on('error', function (err) {
   console.log(err);
 })
 
+console.log(process.env.FACEBOOK_APP_ID);
+console.log(process.env.FACEBOOK_SECRET);
+
+
 app.use(express.static(path.join(__dirname, 'static')));
 
 server.listen(3001, function (err) {
