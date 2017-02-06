@@ -4,7 +4,7 @@ module.exports = {
   encoding: 'utf8',
   parse: function(raw) {
     //(087073819397BR00170205A6022.8269N00518.7227E000.3172029000.00,00000000L00000000)
-    var rex = /\((\d+)BR\d{2}(\d{2})(\d{2})(\d{2})([AV])(\d{1,4}\.\d+)([NS])(\d{1,5}\.\d+)([EW])(\d+\.\d)(\d{2})(\d{2})(\d{2})(\d+\.\d+),(\d+)\w(\d+)\)/;
+    var rex = /\((\d+)BR\d{2}(\d{2})(\d{2})(\d{2})([AV])(\d{4}\.\d{4})([NS])(\d{5}\.\d{4})([EW])(\d+\.\d)(\d{2})(\d{2})(\d{2})(\d+\.\d+),(\d+)\w(\d+)\)/;
     var result = null;
     var match = raw.match(rex);
 
@@ -22,11 +22,11 @@ module.exports = {
             date: '20' + yy + '-' + mm + '-' + dd,
             time: hh + ':' + nn + ':' + ss,
             signal: 'unknown',
-            fix: validity === 'A' ? 'active' : 'invalid'          
+            fix: validity === 'A' ? 'active' : 'invalid'
           },
           geo: {
-            latitude: lat,
-            longitude: lng,
+            latitude: gpsserver.fixGeo(lat, ns),
+            longitude: gpsserver.fixGeo(lng, ew),
             bearing: course
           },
           speed: {

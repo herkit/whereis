@@ -1,4 +1,9 @@
 var tracker = require ('./lib/gpsreceiver/server');
+var express = require('express'),
+    app = express(),
+    server = require('http').Server(app),
+    io = require('socket.io')(server),
+    path = require('path');
 
 // start server
 tracker.createServer ({
@@ -10,9 +15,17 @@ tracker.createServer ({
 
 // incoming data, i.e. update a map
 tracker.on ('track', function (gps) {
+  io.emit('track', gps);
   console.log(gps);
 });
 
 tracker.on('error', function (err) {
   console.log(err);
+})
+
+app.use(express.static(path.join(__dirname, 'static')));
+
+server.listen(3001, function (err) {
+  if (err)
+    console.log(err);
 })

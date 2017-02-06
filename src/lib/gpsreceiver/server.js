@@ -118,4 +118,14 @@ gpsserver.checksum = function (raw) {
   return (check === strsum);
 };
 
+gpsserver.fixGeo = function (one, two) {
+  var minutes = one.substr (-7, 7);
+  var degrees = parseInt (one.replace (minutes, ''), 10);
+
+  one = degrees + (minutes / 60);
+  one = parseFloat ((two === 'S' || two === 'W' ? '-' : '') + one);
+
+  return Math.round (one * 1000000) / 1000000;
+};
+
 module.exports = gpsserver;

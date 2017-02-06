@@ -13,6 +13,7 @@ fixGeo = function (one, two) {
 
 module.exports = {
   encoding: 'utf8',
+  type: 'socket',
   parse: function(raw) {
     var result = null;
     var str = [];
