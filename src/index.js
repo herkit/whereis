@@ -17,7 +17,7 @@ tracker.createServer ({
 
 // incoming data, i.e. update a map
 tracker.on ('track', function (gps) {
-  console.log(gps);
+  console.log("Position received: " + gps.geo.latitude + ", " + gps.geo.longitude);
   geocode.reverseGeo({ lat: gps.geo.latitude, lng: gps.geo.longitude }, function(err, address) {
     if (err) {
       gps.address = { error: err };

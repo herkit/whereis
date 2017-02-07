@@ -15,6 +15,7 @@ module.exports = {
   encoding: 'utf8',
   type: 'socket',
   parse: function(raw) {
+    console.log('(tk102)', raw);
     var result = null;
     var str = [];
     var datetime = '';

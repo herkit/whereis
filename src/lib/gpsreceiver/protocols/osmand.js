@@ -5,18 +5,19 @@ module.exports = {
   type: 'http',
   parse: function(req, res) {
     var up = req.url.split('?');
-    console.log(req.url);
+    console.log("(OsmAnd)", req.url);
 
     if (up.length === 2) {
       var qs = querystring.parse(up[1]);
-      console.log(qs);
-
-      var timestamp;
+      var gpstime;
       try {
-        timestamp = new Date(qs.timestamp).toISOString();
+        if (qs.timestamp > 9999)
+          gpstime = new Date(qs.timestamp * 1000).toISOString();
+        else
+          gpstime = new Date(qs.timestamp).toISOString();
       } catch(err) {
         console.log(err);
-        timestamp = new Date().toISOString();
+        gpstime = new Date().toISOString();
       }        
 
       var course = qs.heading || qs.bearing || '0';
@@ -25,11 +26,11 @@ module.exports = {
       try {
         var result = {
           raw: up[1],
-          datetime: timestamp,
+          datetime: new Date().toISOString(),
           id: qs.id || qs.deviceid || null,
           gps: {
-            date: timestamp.split("T")[0],
-            time: timestamp.split("T")[1],
+            date: gpstime.split("T")[0],
+            time: gpstime.split("T")[1].slice(0, 8),
             signal: 'unknown',
             fix: qs.valid ? 'valid' : 'invalid'
           },

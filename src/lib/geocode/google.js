@@ -30,7 +30,6 @@ module.exports.reverseGeo = function(latlng, callback) {
       callback(err);
     else {
       var result = data.results[0];
-      console.log(result);
       if (result)
       {
         var address = 
