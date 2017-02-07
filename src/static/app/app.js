@@ -2,6 +2,7 @@ var map;
   var marker;
   var trackingPath;
   var positions = [];
+  var locationDiv;
 
   function initialize() {
     google.maps.visualRefresh = true;
@@ -20,6 +21,8 @@ var map;
       mapTypeControl: false,
       streetViewControl: false
     });
+
+    locationDiv = document.getElementById('currentLocation');
 
     map.mapTypes.set("OSM", new google.maps.ImageMapType({
       getTileUrl: function(coord, zoom) {
@@ -44,6 +47,10 @@ var map;
 
     positions.push(latlon);
 
+    if (gps.address) {
+      locationDiv.innerHTML = '<h1>' + gps.address.settlement + '</h1><span class="sub">' + gps.address.district + ", " + gps.address.state_long + ", " + gps.address.country_long + '</span>';
+    }
+
     if (!marker) {
       marker = new google.maps.Marker({ 
         position: latlng, 
@@ -57,7 +64,7 @@ var map;
       if (positions.length >= 2) {
         var lastTwo = positions.slice(-2);
         var d = lastTwo[0].distanceTo(lastTwo[1]);
-        console.log("speed", d * 3600 / 2000, "kmh");
+        var speed = d * 3600 / 2000;
 
         var trackingPathCoordinates = positions.slice(-20).map(function(position) { return { lat: position.lat, lng: position.lon }});
         if(!trackingPath) {

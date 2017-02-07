@@ -41,7 +41,7 @@ module.exports = {
         result = {
           raw: raw,
           datetime: datetime,
-          phone: str [1],
+          id: str [1],
           gps: {
             date: gpsdate,
             time: gpstime,
@@ -58,7 +58,6 @@ module.exports = {
             kmh: Math.round (str [9] * 1.852 * 1000) / 1000,
             mph: Math.round (str [9] * 1.151 * 1000) / 1000
           },
-          imei: str [16] .replace ('imei:', ''),
           checksum: gpsserver.checksum (raw)
         };
       }
