@@ -1,0 +1,4 @@
+FROM node:7.5.0-onbuild
+
+EXPOSE 3001
+EXPOSE 10001-10003
