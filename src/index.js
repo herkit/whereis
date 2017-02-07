@@ -9,9 +9,9 @@ var express = require('express'),
 // start server
 tracker.createServer ({
   protocols: {
-    'tk102': 5006,
-    'tk102-clone1': 5007,
-    'osmand': 5008
+    'tk102': 10001,
+    'tk102-clone1': 10002,
+    'osmand': 10003
   }
 });
 
