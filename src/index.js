@@ -43,6 +43,10 @@ app.get('/', function(req, res) {
   res.render('pages/index', { googleapikey: process.env.GOOGLE_MAPS_CLIENT_KEY });
 });
 
+app.post('/', function(req, res) {
+  res.render('pages/index', { googleapikey: process.env.GOOGLE_MAPS_CLIENT_KEY });
+});
+
 server.listen(3001, function (err) {
   if (err)
     console.log(err);
