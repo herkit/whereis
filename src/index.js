@@ -35,8 +35,13 @@ tracker.on('error', function (err) {
 console.log(process.env.FACEBOOK_APP_ID);
 console.log(process.env.FACEBOOK_SECRET);
 
-
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
 app.use(express.static(path.join(__dirname, 'static')));
+
+app.get('/', function(req, res) {
+  res.render('pages/index', { googleapikey: process.env.GOOGLE_MAPS_CLIENT_KEY });
+});
 
 server.listen(3001, function (err) {
   if (err)
