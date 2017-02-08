@@ -15,6 +15,8 @@ tracker.createServer ({
   }
 });
 
+var history = [];
+
 // incoming data, i.e. update a map
 tracker.on ('track', function (gps) {
   console.log("Position received: " + gps.geo.latitude + ", " + gps.geo.longitude);
@@ -25,8 +27,14 @@ tracker.on ('track', function (gps) {
       gps.address = address;
     }
     io.emit('track', gps);
+    history.push(gps);
   })
 });
+
+/*io.on('connect', function(socket) {
+  if (history.length > 0)
+    socket.emit('track', history.slice(-1));
+})*/
 
 tracker.on('error', function (err) {
   console.log('error', err.reason);

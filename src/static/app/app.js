@@ -97,35 +97,10 @@ var map;
   
     small_credits = '\
       <div style="font-size:0.9em; cursor: pointer;" title="Click to expand OpenStreetMap details"> \
-      <img valign="middle" src="http://wiki.openstreetmap.org/w/images/thumb/' +
-      '7/79/Public-images-osm_logo.svg/24px-Public-images-osm_logo.svg.png"> \
-      <span style="font-size:1.2em; color:BLACK; cursor: hand; opacity: 0.6; filter: alpha(opacity=60); text-shadow: -2px 0 #FFF, 0 2px #FFF, 2px 0 #FFF, 0 -2px #FFF;"> \
-      <b>OpenStreetMap</b> base-map</span> \
+      <span style="font-size:0.8em; color:BLACK; cursor: hand; opacity: 0.6; filter: alpha(opacity=60); text-shadow: -2px 0 #FFF, 0 2px #FFF, 2px 0 #FFF, 0 -2px #FFF;">Powered by</span><br/> \
+      <img src="img/wherever.png" style="height:24px; width: auto" /> \
       </div>';
   
-    big_credits = ' \
-      <div style="font-size:0.7em; background:WHITE; padding:6px;"> \
-      <div style="float:left; padding:2px;"> \
-      <a href="' + osmURL + '"> \
-      <img src="http://wiki.openstreetmap.org/w/images/thumb/7/79/' +
-      'Public-images-osm_logo.svg/64px-Public-images-osm_logo.svg.png" /></a> \
-      </div> \
-      Base map by <b><a href="' + osmURL + '">OpenStreetMap</a></b>, \
-      a free and <a href="http://www.openstreetmap.org/copyright">open \
-      licensed (OdBL)</a> map of the world created by volunteers, mapping \
-      their own neighbourhoods.<br> \
-      <a href="http://www.openstreetmap.org/welcome" title="Welcome to our mapping community">Contribute</a> &nbsp; \
-      <a href="http://donate.openstreetmap.org" title="Donate to the OpenStreetMap Foundation">Donate</a> &nbsp; \
-      <a href="' + noteURL + '" title="Add a note at this location">Report a problem</a><br> \
-      <br> \
-      OpenStreetMap displayed here using google maps javascript\
-      </div>'
-  
-    if (credits.innerHTML==small_credits) {
-      credits.innerHTML = big_credits;
-      credits.style.fontSize = '1.2em';
-    } else {
-      credits.innerHTML = small_credits;
-      credits.style.fontSize = '1em';
-    }
+    credits.innerHTML = small_credits;
+    credits.style.fontSize = '1em';
   }
