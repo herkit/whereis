@@ -4,7 +4,8 @@ var express = require('express'),
     server = require('http').Server(app),
     io = require('socket.io')(server),
     path = require('path'),
-    geocode = require('./lib/geocode');
+    geocode = require('./lib/geocode'),
+    db = require('./server/db');
 
 // start server
 tracker.createServer ({
@@ -18,16 +19,17 @@ tracker.createServer ({
 var history = [];
 
 // incoming data, i.e. update a map
-tracker.on ('track', function (gps) {
-  console.log("Position received: " + gps.geo.latitude + ", " + gps.geo.longitude);
-  geocode.reverseGeo({ lat: gps.geo.latitude, lng: gps.geo.longitude }, function(err, address) {
+tracker.on ('track', function (track) {
+  console.log("Position received: " + track.geo.latitude + ", " + track.geo.longitude);
+  db('gpslog').insert(flatten(track));
+  geocode.reverseGeo({ lat: track.geo.latitude, lng: track.geo.longitude }, function(err, address) {
     if (err) {
-      gps.address = { error: err };
+      track.address = { error: err };
     } else {
-      gps.address = address;
+      track.address = address;
     }
-    io.emit('track', gps);
-    history.push(gps);
+    io.emit('track', track);
+    history.push(track);
   })
 });
 
@@ -59,3 +61,19 @@ server.listen(3001, function (err) {
   if (err)
     console.log(err);
 })
+
+function flatten(o, prefix) {
+  prefix = prefix ? prefix + '_' : '';
+  var result = {};
+  var keys = Object.keys(o).forEach(function(prop) {
+    if (o.hasOwnProperty(prop))
+    {
+      if (typeof o[prop] === "object") {
+        result = Object.assign(result, flatten(o[prop], prefix + prop));
+      } else {
+        result[prefix + prop] = o[prop];
+      }
+    }    
+  });
+  return result;
+}
