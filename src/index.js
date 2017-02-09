@@ -18,7 +18,45 @@ tracker.createServer ({
 
 var history = [];
 
-db('gpslog').select('*').map(function(record) { return restructure(record); }).then(function(data) { history = data; });
+db.
+select(
+  ['gpslog.*'].
+  concat(
+    prefix_names('geolookup', 'address_', 
+      [
+        'street', 
+        'settlement', 
+        'district', 
+        'district_long', 
+        'state', 
+        'state_long', 
+        'country', 
+        'country_long'
+      ]
+    )
+  )
+).
+from('gpslog').
+leftJoin('geolookup', 'gpslog.lookupid', 'geolookup.lookupid').
+orderBy('logid', 'desc').
+limit(10).
+map(function(record) { 
+  return restructure(record); 
+}).then(function(data) {
+  data.reverse();
+  history = data; 
+  io.emit('track', history.slice(-1).pop());
+});
+
+function prefix_names(table, prefix, fields)
+{
+    if (fields instanceof Array) {
+        return fields.map(field_name => table + '.' + field_name+' as '+prefix + field_name);
+    }
+    else {
+        return Array.prototype.slice.call(arguments).map(field_name => table + '.' + field_name+' as '+prefix + field_name);
+    }
+}
 
 // incoming data, i.e. update a map
 tracker.on ('track', function (track) {
@@ -45,10 +83,13 @@ tracker.on ('track', function (track) {
   });
 });
 
-/*io.on('connect', function(socket) {
-  if (history.length > 0)
-    socket.emit('track', history.slice(-1));
-})*/
+io.on('connection', function(socket) {
+  if (history.length > 0) {
+    var current = history.slice(-1).pop();
+    console.log("socket.io connected sending last known position");
+    socket.emit('track', current);
+  }
+})
 
 tracker.on('error', function (err) {
   console.log('error', err.reason);

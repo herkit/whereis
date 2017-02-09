@@ -6,7 +6,7 @@
 <link href="https://fonts.googleapis.com/css?family=Francois+One|Open+Sans" rel="stylesheet">
 <style type="text/css">
 html, body, #googft-mapCanvas {
-  max-height: 480px;
+  max-height: 450px;
   max-width: 810px;
   height: 100%;
   width: 100%;
@@ -31,8 +31,8 @@ div#osmcredits {
   padding: 0px;
   z-index: 1000;
   position: absolute;
-  left: 5px;
-  bottom: 28px;
+  right: 5px;
+  bottom: 5px;
   cursor: pointer;
   max-width:380px;
   font-family: Product Sans, Relish, Helvetica, Arial, sans-serif; 
@@ -63,8 +63,8 @@ div#currentLocation .sub {
 
 <body onLoad="javascript:osmCreditClicked(map);">
   <div id="googft-mapCanvas"></div>
+  <div id="osmcredits" onClick="osmCreditClicked(map);"><b>OpenStreetMap</b> base-map</div>  
   <div id="googlenote" title="OpenStreetMap maps displayed using google maps javascript mapping library maps display"></div>
-  <div id="osmcredits" onClick="osmCreditClicked(map);"><b>OpenStreetMap</b> base-map</div>
   <div id="currentLocation">
 
   </div>

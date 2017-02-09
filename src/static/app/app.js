@@ -36,53 +36,66 @@ var map;
       name: "OpenStreetMap",
       maxZoom: 18
     }));
-  }
 
-  var socket = io.connect();
+    var socket = io.connect();
 
-  socket.on('track', function(gps) {
-    //console.log('track', gps);
-    var latlng = { lat: gps.geo.latitude, lng: gps.geo.longitude };
-    var latlon = new LatLon(gps.geo.latitude, gps.geo.longitude);
+    socket.on('track', function(gps) {
+      //console.log('track', gps);
+      var latlng = { lat: gps.geo.latitude, lng: gps.geo.longitude };
+      var latlon = new LatLon(gps.geo.latitude, gps.geo.longitude);
 
-    positions.push(latlon);
+      positions.push(latlon);
 
-    if (gps.address) {
-      locationDiv.innerHTML = '<h1>' + gps.address.settlement + '</h1><span class="sub">' + gps.address.district + ", " + gps.address.state_long + ", " + gps.address.country_long + '</span>';
-    }
+      if (gps.address) {
+        var parts = [
+          gps.address.settlement, 
+          gps.address.district, 
+          gps.address.address, 
+          gps.address.state_long || gps.address.state, 
+          gps.address.country_long || gps.address.country
+        ].filter(function(item) { return (item !== undefined); });
 
-    if (!marker) {
-      marker = new google.maps.Marker({ 
-        position: latlng, 
-        animation: google.maps.Animation.DROP,
-        map: map
-      });
-      map.setCenter(latlng);
-    } else {
-      marker.setPosition(latlng);
-      map.setCenter(latlng);
-      if (positions.length >= 2) {
-        var lastTwo = positions.slice(-2);
-        var d = lastTwo[0].distanceTo(lastTwo[1]);
-        var speed = d * 3600 / 2000;
-
-        var trackingPathCoordinates = positions.slice(-20).map(function(position) { return { lat: position.lat, lng: position.lon }});
-        if(!trackingPath) {
-          trackingPath = new google.maps.Polyline({
-            path: trackingPathCoordinates,
-            geodesic: true,
-            strokeColor: '#0000FF',
-            strokeOpacity: 0.75,
-            strokeWeight: 3
-          });
-          trackingPath.setMap(map);
-        } else {
-          trackingPath.setPath(trackingPathCoordinates);
+        var html = '<h1>' + parts.shift() + '</h1>';
+        if(parts.length > 0) {
+          html = html + '<span class="sub">' + parts.join(', ') + '</span>';
         }
+        locationDiv.innerHTML = html;
       }
 
-    }
-  });
+      if (!marker) {
+        marker = new google.maps.Marker({ 
+          position: latlng, 
+          animation: google.maps.Animation.DROP,
+          map: map
+        });
+        map.setCenter(latlng);
+      } else {
+        marker.setPosition(latlng);
+        map.setCenter(latlng);
+        if (positions.length >= 2) {
+          var lastTwo = positions.slice(-2);
+          var d = lastTwo[0].distanceTo(lastTwo[1]);
+          var speed = d * 3600 / 2000;
+
+          var trackingPathCoordinates = positions.slice(-20).map(function(position) { return { lat: position.lat, lng: position.lon }});
+          if(!trackingPath) {
+            trackingPath = new google.maps.Polyline({
+              path: trackingPathCoordinates,
+              geodesic: true,
+              strokeColor: '#0000FF',
+              strokeOpacity: 0.75,
+              strokeWeight: 3
+            });
+            trackingPath.setMap(map);
+          } else {
+            trackingPath.setPath(trackingPathCoordinates);
+          }
+        }
+
+      }
+    });
+
+  }
 
   google.maps.event.addDomListener(window, 'load', initialize);
 
