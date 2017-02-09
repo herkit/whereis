@@ -9,14 +9,20 @@ var publicConfig = {
 
 var gmAPI = new GoogleMapsAPI(publicConfig);
 
-var propertyTranslations = {
+var shortNameTranslation = {
   "street_number": "house",
   "route": "street",
   "locality": "settlement",
   "administrative_area_level_2": "district",
   "administrative_area_level_1": "state",
   "country": "country",
-  "postal_code": "postCode"
+  "postal_code": "postcode"
+};
+
+var longNameTranslation = {
+  "administrative_area_level_2": "district_long",
+  "administrative_area_level_1": "state_long",
+  "country": "country_long",
 };
 
 module.exports.reverseGeo = function(latlng, callback) {
@@ -38,9 +44,11 @@ module.exports.reverseGeo = function(latlng, callback) {
           reduce(function(out, component) 
           {
             component.types.forEach(function(type) {
-              if (propertyTranslations[type]) {
-                out[propertyTranslations[type]] = component.short_name;
-                out[propertyTranslations[type] + "_long"] = component.long_name;
+              if (shortNameTranslation[type]) {
+                out[shortNameTranslation[type]] = component.short_name;
+              }
+              if (longNameTranslation[type]) {
+                out[longNameTranslation[type]] = component.long_name;
               }
             });
             return out;

@@ -26,13 +26,18 @@ tracker.on ('track', function (track) {
   db('gpslog').
   insert(flatten(track)).
   returning('logid').
-  then(function(record) { console.log("stored", record); }).
-  then(function() {
+  then(function(logid) {
     geocode.reverseGeo({ lat: track.geo.latitude, lng: track.geo.longitude }, function(err, address) {
       if (err) {
         track.address = { error: err };
       } else {
         track.address = address;
+        db('geolookup').
+        insert(Object.assign(flatten(address), { latitude: track.geo.latitude, longitude: track.geo.longitude })).
+        returning('lookupid').
+        then(function(lookupid) {
+          db('gpslog').where('logid', logid[0]).update({ 'lookupid': lookupid[0] }).then(() => { console.log("stored address"); });
+        });
       }
       io.emit('track', track);
       history.push(track);

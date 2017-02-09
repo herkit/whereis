@@ -10,11 +10,12 @@ module.exports = {
   },
 
   production: {
-    client: 'mongo',
+    client: 'mysql',
     connection: {
-      database: 'my_db',
-      user:     'username',
-      password: 'password'
+      host:     process.env.MYSQL_HOST,
+      database: process.env.MYSQL_DATABASE,
+      user:     process.env.MYSQL_USERNAME,
+      password: process.env.MYSQL_PASSWORD
     },
     pool: {
       min: 2,
