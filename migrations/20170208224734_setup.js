@@ -7,6 +7,7 @@ exports.up = function(knex, Promise) {
       table.timestamps();
     }),
     knex.schema.createTable('gpslog', function(table){
+      table.increments('logid');
       table.string('raw');
       table.dateTime('datetime');
       table.string('id');
@@ -17,7 +18,9 @@ exports.up = function(knex, Promise) {
       table.float('geo_latitude');
       table.float('geo_longitude');
       table.integer('geo_bearing');
-      table.float('speed');
+      table.float('speed_kmh');
+      table.float('speed_knots');
+      table.float('speed_mph');
       table.string('checksum');
     })
   ])  

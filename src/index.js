@@ -18,19 +18,26 @@ tracker.createServer ({
 
 var history = [];
 
+db('gpslog').select('*').map(function(record) { return restructure(record); }).then(function(data) { history = data; });
+
 // incoming data, i.e. update a map
 tracker.on ('track', function (track) {
   console.log("Position received: " + track.geo.latitude + ", " + track.geo.longitude);
-  db('gpslog').insert(flatten(track));
-  geocode.reverseGeo({ lat: track.geo.latitude, lng: track.geo.longitude }, function(err, address) {
-    if (err) {
-      track.address = { error: err };
-    } else {
-      track.address = address;
-    }
-    io.emit('track', track);
-    history.push(track);
-  })
+  db('gpslog').
+  insert(flatten(track)).
+  returning('logid').
+  then(function(record) { console.log("stored", record); }).
+  then(function() {
+    geocode.reverseGeo({ lat: track.geo.latitude, lng: track.geo.longitude }, function(err, address) {
+      if (err) {
+        track.address = { error: err };
+      } else {
+        track.address = address;
+      }
+      io.emit('track', track);
+      history.push(track);
+    })  
+  });
 });
 
 /*io.on('connect', function(socket) {
@@ -62,8 +69,9 @@ server.listen(3001, function (err) {
     console.log(err);
 })
 
-function flatten(o, prefix) {
-  prefix = prefix ? prefix + '_' : '';
+function flatten(o, prefix, separator) {
+  separator = separator || '_';
+  prefix = prefix ? prefix + separator : '';
   var result = {};
   var keys = Object.keys(o).forEach(function(prop) {
     if (o.hasOwnProperty(prop))
@@ -74,6 +82,28 @@ function flatten(o, prefix) {
         result[prefix + prop] = o[prop];
       }
     }    
+  });
+  return result;
+}
+
+function restructure(o, separator) {
+  separator = separator || "_";
+  var result = {};
+  var keys = Object.keys(o).forEach(function(prop) {
+    if (o.hasOwnProperty(prop))
+    {
+      var properties = prop.split(separator);
+      var value = o[prop];
+      current = result;
+      for(var level = 0; level < properties.length; level++) {
+        if (level < properties.length - 1) {
+          current[properties[level]] = current[properties[level]] || {};
+        } else {
+          current[properties[level]] = value;
+        }
+        current = current[properties[level]];
+      }
+    }
   });
   return result;
 }
