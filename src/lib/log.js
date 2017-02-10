@@ -5,7 +5,7 @@ var logger = new (winston.Logger)({
   transports: [
     new (winston.transports.Console)({
       timestamp: function() {
-        return new Date().toISOString();
+        return new Date().toUTCString();
       },
       formatter: function(options) {
         // Return string will be passed to logger. 
