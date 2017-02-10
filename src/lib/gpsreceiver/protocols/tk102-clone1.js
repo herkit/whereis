@@ -1,11 +1,12 @@
-var gpsserver = require('../server');
+var gpsserver = require('../server'),
+    debug = require('debug')('whereis:gpsreceiver:protocol:tk102-clone1');
 
 module.exports = {
   encoding: 'utf8',
   type: 'socket',
   parse: function(raw) {
     //(087073819397BR00170205A6022.8269N00518.7227E000.3172029000.00,00000000L00000000)
-    console.log('(tk102-clone1)', raw);
+    debug(raw);
     var rex = /\((\d+)BR\d{2}(\d{2})(\d{2})(\d{2})([AV])(\d{4}\.\d{4})([NS])(\d{5}\.\d{4})([EW])(\d+\.\d)(\d{2})(\d{2})(\d{2})(\d+\.\d+),(\d+)\w(\d+)\)/;
     var result = null;
     var match = raw.match(rex);

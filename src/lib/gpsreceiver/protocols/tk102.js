@@ -1,4 +1,5 @@
-var gpsserver = require('../server');
+var gpsserver = require('../server'),
+    debug = require('debug')('whereis:gpsreceiver:protocol:tk102');
 
 fixGeo = function (one, two) {
   var minutes = one.substr (-7, 7);
@@ -15,7 +16,7 @@ module.exports = {
   encoding: 'utf8',
   type: 'socket',
   parse: function(raw) {
-    console.log('(tk102)', raw);
+    debug(raw);
     var result = null;
     var str = [];
     var datetime = '';

@@ -1,5 +1,6 @@
 var tracker = require ('./lib/gpsreceiver/server');
 var express = require('express'),
+    log = require('./lib/log'),
     app = express(),
     server = require('http').Server(app),
     io = require('socket.io')(server),
@@ -60,7 +61,8 @@ function prefix_names(table, prefix, fields)
 
 // incoming data, i.e. update a map
 tracker.on ('track', function (track) {
-  console.log("Position received: " + track.geo.latitude + ", " + track.geo.longitude);
+  log.info('Tracker data: %s', track.raw);
+  log.debug("Position received: " + track.geo.latitude + ", " + track.geo.longitude);
   db('gpslog').
   insert(flatten(track)).
   returning('logid').
@@ -74,7 +76,9 @@ tracker.on ('track', function (track) {
         insert(Object.assign(flatten(address), { latitude: track.geo.latitude, longitude: track.geo.longitude })).
         returning('lookupid').
         then(function(lookupid) {
-          db('gpslog').where('logid', logid[0]).update({ 'lookupid': lookupid[0] }).then(() => { console.log("stored address"); });
+          db('gpslog').where('logid', logid[0]).update({ 'lookupid': lookupid[0] }).then(() => { 
+            log.debug("stored address"); 
+          });
         });
       }
       io.emit('track', track);
@@ -86,17 +90,17 @@ tracker.on ('track', function (track) {
 io.on('connection', function(socket) {
   if (history.length > 0) {
     var current = history.slice(-1).pop();
-    console.log("socket.io connected sending last known position");
+    log.debug("socket.io connected sending last known position");
     socket.emit('track', current);
   }
 })
 
 tracker.on('error', function (err) {
-  console.log('error', err.reason);
+  log.error('tracker error', err.reason);
 })
 
-console.log(process.env.FACEBOOK_APP_ID);
-console.log(process.env.FACEBOOK_SECRET);
+log.debug(process.env.FACEBOOK_APP_ID);
+log.debug(process.env.FACEBOOK_SECRET);
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -112,7 +116,7 @@ app.post('/', function(req, res) {
 
 server.listen(3001, function (err) {
   if (err)
-    console.log(err);
+    log.error(err);
 })
 
 function flatten(o, prefix, separator) {

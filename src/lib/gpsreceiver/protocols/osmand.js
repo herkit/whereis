@@ -1,11 +1,12 @@
 var querystring = require('querystring');
-var gpsserver = require('../server');
+var gpsserver = require('../server'),
+    debug = require('debug')('whereis:gpsreceiver:protocol:OsmAnd');
 
 module.exports = {
   type: 'http',
   parse: function(req, res) {
     var up = req.url.split('?');
-    console.log("(OsmAnd)", req.url);
+    debug(req.url);
 
     if (up.length === 2) {
       var qs = querystring.parse(up[1]);
@@ -16,7 +17,7 @@ module.exports = {
         else
           gpstime = new Date(qs.timestamp).toISOString();
       } catch(err) {
-        console.log(err);
+        debug(err);
         gpstime = new Date().toISOString();
       }        
 
@@ -48,7 +49,7 @@ module.exports = {
         }
         return result;
       } catch(err) {
-        console.log(err);
+        debug(err);
         return null;
       }
     }
