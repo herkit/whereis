@@ -107,11 +107,15 @@ app.set('view engine', 'ejs');
 app.use(express.static(path.join(__dirname, 'static')));
 
 app.get('/', function(req, res) {
-  res.render('pages/index', { googleapikey: process.env.GOOGLE_MAPS_CLIENT_KEY });
+  res.render('pages/index', { googleapikey: process.env.GOOGLE_MAPS_CLIENT_KEY, renderflightpath: false });
 });
 
 app.post('/', function(req, res) {
-  res.render('pages/index', { googleapikey: process.env.GOOGLE_MAPS_CLIENT_KEY });
+  res.render('pages/index', { googleapikey: process.env.GOOGLE_MAPS_CLIENT_KEY, renderflightpath: false });
+});
+
+app.get('/flightpathtest', function(req, res) {
+  res.render('pages/index', { googleapikey: process.env.GOOGLE_MAPS_CLIENT_KEY, renderflightpath: true });  
 });
 
 server.listen(3001, function (err) {
