@@ -1,94 +1,22 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta name="viewport"></meta>
-<title>Where is The Great Escape?</title>
-<link href="https://fonts.googleapis.com/css?family=Francois+One|Open+Sans" rel="stylesheet">
-<style type="text/css">
-html,body {
-  /*max-width: 810px;*/
-  height: 100%;
-  margin: 0;
-  padding: 0;
-}
-#googft-mapCanvas {
-  /*max-height: 600px;*/
-  /*max-width: 810px;*/
-  height: 100%;
-  width: 100%;
-  margin: 0;
-  padding: 0;
-}
-#wrapper {
-  /*max-height: 600px;*/
-  /*max-width: 810px;*/
-  height: 100%;
-  width: 100%;
-  margin: 0;
-  padding: 0;
-  position: relative;
-}
-
-div#googlenote {
-  color: black;
-  padding: 0px;
-  z-index: 1000;
-  position: absolute;
-  left: 74px;
-  bottom: 4px;
-  opacity: 0.6;
-  filter: alpha(opacity=60);
-  text-shadow: -2px 0 #FFF, 0 2px #FFF, 2px 0 #FFF, 0 -2px #FFF;
-  font-family: Product Sans, Relish, Helvetica, Arial, sans-serif; 
-}
-
-div#osmcredits {
-  padding: 0px;
-  z-index: 1000;
-  position: absolute;
-  right: 5px;
-  top: 5px;
-  cursor: pointer;
-  max-width:380px;
-  font-family: Product Sans, Relish, Helvetica, Arial, sans-serif; 
-}
-
-div#currentLocation {
-  margin: 10px;
-}
-
-div#currentLocation h1 {
-  font-family: 'Russo One', sans-serif;
-  font-size: 40px;
-  margin: 0px;
-}
-div#currentLocation .sub {
-  font-family: 'Open Sans';
-  font-size: 20px;
-}
-
-</style>
-
 <script src="app/geo.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.2/socket.io.js" integrity="sha256-lDaoGuONbVHFEV6ZW3GowBu4ECOTjDE14hleNVBvDW8=" crossorigin="anonymous"></script>
 <script type="text/javascript" src="https://maps.google.com/maps/api/js?v=3&key=<%= googleapikey %>"></script>
 
 <script type="text/javascript" src="app/app.js"></script>
-<% if (renderflightpath) { %>
+<% if (locals.renderflightpath) { %>
 <script type="text/javascript" src="app/flight.js"></script>
 <% } %>
 </head>
 
-<body onLoad="javascript:osmCreditClicked(map);">
+<body>
   <div id="wrapper">
-    <div id="googft-mapCanvas"></div>
-    <div id="osmcredits" onClick="osmCreditClicked(map);"><b>OpenStreetMap</b> base-map</div>  
+    <div id="whereis-mapCanvas"></div>
+    <div id="poweredby"></div>  
   </div>
-  <div id="googlenote" title="OpenStreetMap maps displayed using google maps javascript mapping library maps display"></div>
   <div id="currentLocation">
 
   </div>
 </body>
-</html>
+
 
     

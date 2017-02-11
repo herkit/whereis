@@ -1,5 +1,7 @@
-var map;
-var me;
+var whereis = {
+
+}
+
 var onflight = false;
 var trackingPath;
 var positions = [];
@@ -35,9 +37,9 @@ function initialize() {
     var viewport = document.querySelector("meta[name=viewport]");
     viewport.setAttribute('content', 'initial-scale=1.0, user-scalable=no');
   }
-  var mapDiv = document.getElementById('googft-mapCanvas');
+  var mapDiv = document.getElementById('whereis-mapCanvas');
 
-  window.map = new google.maps.Map(mapDiv, {
+  window.whereis.map = new google.maps.Map(mapDiv, {
     center: new google.maps.LatLng(28.538336, -81.379234),
     zoom: 12,
     mapTypeControl: false,
@@ -70,14 +72,14 @@ function initialize() {
       locationDiv.innerHTML = html;
     }
 
-    if (!me) {
-      me = new google.maps.Marker({ 
+    if (!whereis.me) {
+      whereis.me = new google.maps.Marker({ 
         icon: harleyIcon,
         position: latlng, 
         animation: google.maps.Animation.DROP,
-        map: map
+        map: whereis.map
       });
-      map.setCenter(latlng);
+      whereis.map.setCenter(latlng);
     } else {
       if (!onflight) {
         setMyPosition(latlng);
@@ -91,20 +93,22 @@ function initialize() {
               strokeOpacity: 0.75,
               strokeWeight: 4
             });
-            trackingPath.setMap(map);
+            trackingPath.setMap(whereis.map);
           } else {
             trackingPath.setPath(trackingPathCoordinates);
           }
         }
       }
     }
+
+    showPoweredBy();
   });
 }
 
 function setMyPosition(latlng) {
-  me.setPosition(latlng);
+  whereis.me.setPosition(latlng);
   if (mapFollow)
-    map.setCenter(latlng);
+    whereis.map.setCenter(latlng);
 }
 
 function zoomToObject(obj){
@@ -113,16 +117,13 @@ function zoomToObject(obj){
     for (var n = 0; n < points.length ; n++){
         bounds.extend(points[n]);
     }
-    map.fitBounds(bounds);
+    whereis.map.fitBounds(bounds);
 }
 
 google.maps.event.addDomListener(window, 'load', initialize);
 
-function osmCreditClicked(map) {
-  credits = document.getElementById('osmcredits');
-
-  mapParam = 'map=' + map.getZoom() + '/' +
-    map.getCenter().lat() + '/' + map.getCenter().lng();
+function showPoweredBy() {
+  credits = document.getElementById('poweredby');
 
   small_credits = '\
     <div style="font-size:0.9em; cursor: pointer;"> \

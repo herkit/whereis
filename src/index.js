@@ -2,6 +2,7 @@ var tracker = require ('./lib/gpsreceiver/server');
 var express = require('express'),
     log = require('./lib/log'),
     app = express(),
+    partials = require('express-partials'),
     server = require('http').Server(app),
     io = require('socket.io')(server),
     path = require('path'),
@@ -105,13 +106,18 @@ log.debug(process.env.FACEBOOK_SECRET);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 app.use(express.static(path.join(__dirname, 'static')));
+app.use(partials());
 
 app.get('/', function(req, res) {
   res.render('pages/index', { googleapikey: process.env.GOOGLE_MAPS_CLIENT_KEY, renderflightpath: false });
 });
 
 app.post('/', function(req, res) {
-  res.render('pages/index', { googleapikey: process.env.GOOGLE_MAPS_CLIENT_KEY, renderflightpath: false });
+  res.render('pages/index', { googleapikey: process.env.GOOGLE_MAPS_CLIENT_KEY, isFacebook: true });
+});
+
+app.get('/facebook', function(req, res) {
+  res.render('pages/index', { googleapikey: process.env.GOOGLE_MAPS_CLIENT_KEY, isFacebook: true });
 });
 
 app.get('/flightpathtest', function(req, res) {

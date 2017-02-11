@@ -20,12 +20,11 @@
       strokeWeight: 4
     });    
     zoomToObject(flightPath);
-    flightPath.setMap(map);
-    flightPathSoFar.setMap(map);
+    flightPath.setMap(whereis.map);
+    flightPathSoFar.setMap(whereis.map);
     var progress = 0;
     var flightStart = new LatLon(flightPlan[0].lat, flightPlan[0].lng);
     var flightEnd = new LatLon(flightPlan[1].lat, flightPlan[1].lng);
-    console.log(flightStart, flightEnd);
     var flightPosition = flightStart;
 
     var bearing;
@@ -50,9 +49,9 @@
         onflight = false;
       }
       if (onflight)
-        window.me.setIcon(planeIcon);
+        window.whereis.me.setIcon(planeIcon);
       else 
-        window.me.setIcon(harleyIcon);
+        window.whereis.me.setIcon(harleyIcon);
       setMyPosition({ lat: flightPosition.lat, lng: flightPosition.lon });
       flightPathSoFar.setPath([{lat: flightStart.lat, lng: flightStart.lon}, {lat: flightPosition.lat, lng: flightPosition.lon}])
       if (progress >= 1)
