@@ -6,6 +6,8 @@ var express = require('express'),
     server = require('http').Server(app),
     io = require('socket.io')(server),
     path = require('path'),
+    passport = require('./auth'),
+    expressSession = require('express-session'),
     geocode = require('./lib/geocode'),
     db = require('./server/db');
 
@@ -107,6 +109,9 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 app.use(express.static(path.join(__dirname, 'static')));
 app.use(partials());
+app.use(expressSession({secret: 'mySecretKey'}));
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.get('/', function(req, res) {
   res.render('pages/index', { googleapikey: process.env.GOOGLE_MAPS_CLIENT_KEY, renderflightpath: false });
@@ -123,6 +128,12 @@ app.get('/facebook', function(req, res) {
 app.get('/flightpathtest', function(req, res) {
   res.render('pages/index', { googleapikey: process.env.GOOGLE_MAPS_CLIENT_KEY, renderflightpath: true });  
 });
+
+app.get('/admin', function(req, res) {
+  res.render('pages/admin/index', { layout: 'admin', googleapikey: process.env.GOOGLE_MAPS_CLIENT_KEY });  
+});
+
+require('./api')(app);
 
 server.listen(3001, function (err) {
   if (err)
