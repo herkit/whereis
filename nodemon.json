@@ -1,5 +1,5 @@
 {
   "verbose": true,
-  "ignore": ["*.json", "data/*", "*.ejs"],
+  "ignore": ["*.json", "data/*", "*.ejs", "migrations/*.js"],
   "exec": "nf start"
 }
