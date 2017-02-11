@@ -22,19 +22,35 @@ function flatten(o, prefix, separator) {
 function restructure(o, separator) {
   separator = separator || "_";
   var result = {};
-  var keys = Object.keys(o).forEach(function(prop) {
+  var keys = Object.keys(o);
+  keys.forEach(function(prop) {
     if (o.hasOwnProperty(prop))
     {
       var properties = prop.split(separator);
       var value = o[prop];
       current = result;
+      /*
+      [p4, p1]
+      [p4, p1, p1, p1]
+      [p4, p1, p1, p2]
+      */
       for(var level = 0; level < properties.length; level++) {
+        var property = properties[level];
+        console.log(result)
+        /*if (keys.indexOf(properties.slice(0, level + 1).join("_")) >= 0) // has a value at this level
+        {
+          console.log("found", properties.slice(level, 2).join("_"));
+          property = properties.slice(level, 2).join("_");
+          level++;
+        }*/
+
         if (level < properties.length - 1) {
-          current[properties[level]] = current[properties[level]] || {};
+          current[property] = current[property] || {};
         } else {
-          current[properties[level]] = value;
+          current[property] = value;
         }
-        current = current[properties[level]];
+
+        current = current[property];
       }
     }
   });
