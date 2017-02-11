@@ -10,7 +10,8 @@ var express = require('express'),
     expressSession = require('express-session'),
     bodyParser = require('body-parser'),
     geocode = require('./lib/geocode'),
-    db = require('./server/db');
+    db = require('./server/db'),
+    model = require('./server/model');
 
 
 db.init().then(() => {
@@ -42,7 +43,7 @@ leftJoin('geolookup', 'gpslog.lookupid', 'geolookup.lookupid').
 orderBy('logid', 'desc').
 limit(10).
 map(function(record) { 
-  return db.restructure(record); 
+  return model.restructure(record); 
 }).then(function(data) {
   data.reverse();
   history = data; 
@@ -70,7 +71,7 @@ tracker.on ('track', function (track) {
   log.info('Tracker data: %s', track.raw);
   log.debug("Position received: " + track.geo.latitude + ", " + track.geo.longitude);
   db('gpslog').
-  insert(db.flatten(track)).
+  insert(model.flatten(track)).
   returning('logid').
   then(function(logid) {
     geocode.reverseGeo({ lat: track.geo.latitude, lng: track.geo.longitude }, function(err, address) {
@@ -79,7 +80,7 @@ tracker.on ('track', function (track) {
       } else {
         track.address = address;
         db('geolookup').
-        insert(Object.assign(db.flatten(address), { latitude: track.geo.latitude, longitude: track.geo.longitude })).
+        insert(Object.assign(model.flatten(address), { latitude: track.geo.latitude, longitude: track.geo.longitude })).
         returning('lookupid').
         then(function(lookupid) {
           db('gpslog').where('logid', logid[0]).update({ 'lookupid': lookupid[0] }).then(() => { 

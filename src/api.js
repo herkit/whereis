@@ -4,7 +4,8 @@ var cache = require('./lib/geoloccache'),
     passport = require('./auth'), 
     moment = require('moment'),
     Promise = require('bluebird'),
-    db = require('./server/db');
+    db = require('./server/db'),
+    model = require('./server/model');
 
 var GoogleMapsAPI = require('googlemaps');
 
@@ -87,7 +88,7 @@ module.exports = function(app) {
     }).
     then((flightdata) => {
       flightdata.createdby = req.user.id;
-      db.insert(db.flatten(flightdata)).into('flights').returning('id').then(function(record) {
+      db.insert(model.flatten(flightdata)).into('flights').returning('id').then(function(record) {
         flightdata.id = record[0]
         res.status(200).send(flightdata);  
       }).
