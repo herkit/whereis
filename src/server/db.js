@@ -22,36 +22,37 @@ function flatten(o, prefix, separator) {
 function restructure(o, separator) {
   separator = separator || "_";
   var result = {};
+  var last = result;
+  var lastproperty;
   var keys = Object.keys(o);
-  keys.forEach(function(prop) {
-    if (o.hasOwnProperty(prop))
-    {
-      var properties = prop.split(separator);
-      var value = o[prop];
-      current = result;
-      /*
-      [p4, p1]
-      [p4, p1, p1, p1]
-      [p4, p1, p1, p2]
-      */
-      for(var level = 0; level < properties.length; level++) {
-        var property = properties[level];
-        console.log(result)
-        /*if (keys.indexOf(properties.slice(0, level + 1).join("_")) >= 0) // has a value at this level
-        {
-          console.log("found", properties.slice(level, 2).join("_"));
-          property = properties.slice(level, 2).join("_");
-          level++;
-        }*/
+  
+  var paths = keys.filter(function(prop) {
+    return o.hasOwnProperty(prop);
+  }).map(function(prop) {
+    return prop.split(separator).concat(o[prop]);
+  })
 
-        if (level < properties.length - 1) {
-          current[property] = current[property] || {};
-        } else {
-          current[property] = value;
-        }
+  paths.forEach(function(part) {
+    var path = part.slice(0, part.length - 1);
+    var conflicts = paths.filter(function(otherpart) {
+      return (otherpart.length > part.length && otherpart.slice(0, path.length).join(separator) === path.join(separator));
+    })
+    conflicts.forEach(function(conflict) {
+      var newprop = conflict[path.length - 1] + separator + conflict[path.length];
+      conflict.splice(path.length - 1, 2, newprop);
+    });
+  })
 
+  paths.forEach(function(properties) {
+    var value = properties.pop();
+    current = result;
+    for (var pidx = 0; pidx < properties.length; pidx++) {
+      var property = properties[pidx];
+      current[property] = current[property] || {};
+      if (pidx == properties.length - 1)
+        current[property] = value;
+      else
         current = current[property];
-      }
     }
   });
   return result;
