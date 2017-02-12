@@ -4,6 +4,7 @@ var passport = require('passport'),
     debug = require('debug')('whereis:auth');
 
 passport.serializeUser(function(user, done) {
+  debug("serializeUser", user);
   done(null, user.id);
 });
  
@@ -11,8 +12,9 @@ passport.deserializeUser(function(id, done) {
   db('users').
   select('*').
   where('id', id).
-  then(function(user) {
-    done(null, user[0]);
+  then(function(records) {
+    var user = records[0];
+    done(null, user);
   }).
   catch((err) => {
     done(err);
@@ -30,8 +32,9 @@ passport.use('local',
     db('users').
     select('*').
     where('username', username).
-    then((users) => {
-      var user = users[0];
+    then((records) => {
+      var user = records[0];
+
       if (!user) {
         return done(null, false);
       }

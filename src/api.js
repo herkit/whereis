@@ -47,9 +47,22 @@ module.exports = function(app) {
       if (!user) { res.status(401).send('Not authorized'); }
       req.logIn(user, function(err) {
         if (err) { return next(err); }
-        return res.status(200).send('ok');
+        return res.status(200).send(user);
       });
     })(req, res, next);
+  });
+
+  app.get('/api/flights', isAuthenticated, function(req, res) {
+    db('flights').
+    select('*').
+    map((record) => { return model.restructure(record); }).
+    then((data) => {
+      res.send(data);
+    }).
+    catch((err) => {
+      res.status(404);
+      res.end();
+    });
   });
 
   app.post('/api/flights', isAuthenticated, function(req, res) {
