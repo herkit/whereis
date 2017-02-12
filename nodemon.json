@@ -1,12 +1,12 @@
 {
   "verbose": true,
   "ignore": [
-    "*.json", 
-    "data/*", 
-    "*.ejs", 
-    "migrations/*", 
-    "test/**/*.js",
-    "src/static/**/*"
+    "node_modules/**",
+    "migrations/**", 
+    "test/**",
+    "src/static/**",
+    "src/views/**",
+    "data/**"
   ],
   "exec": "nf start"
 }

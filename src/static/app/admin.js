@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('WhereisAdminApp', ['ngMaterial']);
+angular.module('WhereisAdminApp', ['ngMaterial', 'angularMoment']);
 
 angular
 .module('WhereisAdminApp')

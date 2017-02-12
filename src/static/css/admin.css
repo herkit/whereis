@@ -15,3 +15,17 @@
     -webkit-transform: rotate(270deg); /* Chrome, Safari, Opera */
     transform: rotate(270deg);
 }
+
+.flightinfo .time {
+  font-size: 150%;
+  font-weight: bold;
+}
+
+.flightinfo .iata {
+  font-weight: bold;
+}
+
+.flightinfo .name, .flightinfo .date {
+  font-size: 70%;
+  color: #666;
+}

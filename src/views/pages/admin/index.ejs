@@ -15,15 +15,19 @@
 <div layout="row" flex>
   <md-list ng-controller="FlightsCtrl" ng-cloak flex="33">
     <md-list-item ng-repeat="flight in flights">
-    <div layout="row" flex="40">
-      <div flex="45">
-        <div>{{flight.from.name}} {{flight.from.code}}</div>
-        <div>{{flight.from.timestamp}}</div>
+    <div layout="row" flex="50">
+      <div flex="45" class="flightinfo">
+        <div class="name">{{flight.from.name}}</div>
+        <div class="iata" flex>{{flight.from.code}}</div>
+        <div class="date">{{flight.from.timestamp | amFromUnix | amDateFormat:'DD. MMM'}}</div>
+        <div class="time">{{flight.from.timestamp | amFromUnix | amDateFormat:'HH:mm'}}</div>
       </div>
       <md-icon class="material-icons rotate90">flight</md-icon>
-      <div flex="45">
-        <div>{{flight.to.name}} {{flight.to.code}}</div>
-        <div>{{flight.to.timestamp}}</div>
+      <div flex="45" layout="column" class="flightinfo">
+        <div class="name">{{flight.to.name}}</div>
+        <div class="iata"flex>{{flight.to.code}}</div>
+        <div class="date">{{flight.to.timestamp | amFromUnix | amDateFormat:'DD. MMMM'}}</div>
+        <div class="time">{{flight.to.timestamp | amFromUnix | amDateFormat:'HH:mm'}}</div>
       </div>
     </div>
     <md-icon class="md-secondary" aria-label="Start flight" class="material-icons" ng-click="startFlight(flight)">flight_takeoff</md-icon>
