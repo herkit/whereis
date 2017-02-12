@@ -5,7 +5,8 @@
     "data/*", 
     "*.ejs", 
     "migrations/*", 
-    "test/**/*.js"
+    "test/**/*.js",
+    "src/static/**/*"
   ],
   "exec": "nf start"
 }

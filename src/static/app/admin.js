@@ -34,6 +34,25 @@ angular
     );
   };
 
+  svc.sendCommand = function(command, data, callback) {
+    $http.
+    post('/api/command/' + command, data).
+    then(
+      function(result) {
+        callback(null, result.data);
+      },
+      function(err) {
+        console.log(err);
+        if (err.code === 401) {
+          svc.login(function(err) {
+            if (!err) 
+              svc.sendCommand(command, data, callback); 
+          });
+        }
+      }
+    )
+  }
+
   svc.getFlights = function(callback) {
     $http.
     get('/api/flights').
@@ -53,9 +72,41 @@ angular
 angular
 .module('WhereisAdminApp')
 .controller('FlightsCtrl',
-  function($scope, adminApi) {
+  function($scope, $mdToast, $mdDialog, adminApi) {
     var ctrl = this;
     $scope.flights = [];
+    function sendStartFlightCommand(flight) {
+      adminApi.sendCommand('startflight', { id: flight.id }, function(err, result) {
+        if (err)
+          $mdToast.show($mdToast.simple().textContent("Unable to start flight"));
+        else
+          $mdToast.show($mdToast.simple().textContent("Starting flight"));
+      })
+    };
+
+    $scope.startFlight = function(flight) {
+      if (flight.from.timestamp > Date.now() / 1000 + 3600) 
+      {
+        var timeString = new Date(flight.from.timestamp * 1000).toISOString()
+        var confirm = $mdDialog.confirm()
+          .title('Do you really want to start this flight?')
+          .textContent(flight.from.name + ' - ' + flight.to.name + ' ' + timeString + "\nThis flight is more than one hour away, are you sure you want to start it?")
+          .ariaLabel('Start flight')
+          .ok('Yes, ofcourse!')
+          .cancel('No, I misclicked...');
+
+        $mdDialog.show(confirm).then(
+          function() {
+            sendStartFlightCommand(flight);
+          }, 
+          function() {
+            $mdToast.show($mdToast.simple().textContent("Canceled start flight command"));
+          }
+        );
+      }
+      else
+        sendStartFlightCommand(flight);
+    }
     adminApi.getFlights(function(err, flights) {
       console.log(err, flights);
       if (!err)
