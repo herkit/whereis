@@ -11,7 +11,8 @@ var express = require('express'),
     bodyParser = require('body-parser'),
     geocode = require('./lib/geocode'),
     db = require('./server/db'),
-    model = require('./server/model');
+    model = require('./server/model'),
+    events = require('./events');
 
 
 db.init().then(() => {
@@ -19,6 +20,30 @@ db.init().then(() => {
 log.info("Database initialized");
 // start server
 var history = [];
+var currentFlight = {};
+
+var trackingState = "tracking";
+
+events.on('command:stoptracking', function() {
+  trackingState = "stopped";
+});
+events.on('command:starttracking', function() {
+  trackingState = "tracking";
+})
+events.on('command:startflight', function(data) {
+  db('flights').
+  select('*').
+  where('id', data.id).
+  then((records) => {
+    trackingState = 'flight';
+    var flightData = model.restructure(records[0]);
+    var flightTime = flightData.to.timestamp - flightData.from.timestamp;
+    flightData.from.timestamp = Date.now() / 1000;
+    flightData.to.timestamp = flightData.from.timestamp + flightTime;
+    log.debug(flightData);
+    io.emit('flight', flightData);
+  })
+})
 
 db.
 select(
@@ -46,17 +71,23 @@ map(function(record) {
   return model.restructure(record); 
 }).then(function(data) {
   data.reverse();
-  history = data; 
-  io.emit('track', history.slice(-1).pop());
+  history = data;
+  emitTrack(io, history.slice(-1).pop());
 });
 
 io.on('connection', function(socket) {
   if (history.length > 0) {
     var current = history.slice(-1).pop();
     log.debug("socket.io connected sending last known position");
-    socket.emit('track', current);
+    emitTrack(socket, current);
   }
 })
+
+
+function emitTrack(io, track) {
+  if (trackingState === "tracking")
+    io.emit('track', track);
+}
 
 tracker.createServer ({
   protocols: {
@@ -88,8 +119,8 @@ tracker.on ('track', function (track) {
           });
         });
       }
-      io.emit('track', track);
       history.push(track);
+      emitTrack(io, track);
     })  
   });
 });

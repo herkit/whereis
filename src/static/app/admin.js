@@ -4,7 +4,7 @@ angular.module('WhereisAdminApp', ['ngMaterial']);
 
 angular
 .module('WhereisAdminApp')
-.factory('auth', function($http, $mdDialog) {
+.factory('adminApi', function($http, $mdDialog) {
   var svc = this;
   svc.me = {};
   svc.login = function(callback) {
@@ -33,26 +33,36 @@ angular
       }
     );
   };
+
+  svc.getFlights = function(callback) {
+    $http.
+    get('/api/flights').
+    then(function(flights) {
+      callback(null, flights.data);
+    }, function(err) {
+      svc.login(function(err) {
+        if (!err) 
+          svc.getFlights(callback); 
+      });
+    });
+  }
+
   return svc;
 })
 
 angular
 .module('WhereisAdminApp')
 .controller('FlightsCtrl',
-  function($scope, $http, auth) {
+  function($scope, adminApi) {
     var ctrl = this;
-
-    ctrl.loadFlights = function() {
-      $http.get('/api/flights').then(function(flights) {
-        $scope.flights = flights.data;
-      }, function(err) {
-        auth.login(function(err) { if (!err) ctrl.loadFlights(); });
-      });  
-    }
-    
-    ctrl.loadFlights();
+    $scope.flights = [];
+    adminApi.getFlights(function(err, flights) {
+      console.log(err, flights);
+      if (!err)
+        $scope.flights = flights;
+    });
   }
-)
+);
 
 function LoginDialogController($scope, $mdDialog) {
 

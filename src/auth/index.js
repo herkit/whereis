@@ -14,7 +14,7 @@ passport.deserializeUser(function(id, done) {
   where('id', id).
   then(function(records) {
     var user = records[0];
-    done(null, user);
+    done(null, getMe(user));
   }).
   catch((err) => {
     done(err);
@@ -34,15 +34,13 @@ passport.use('local',
     where('username', username).
     then((records) => {
       var user = records[0];
-
       if (!user) {
         return done(null, false);
       }
-      debug('user found', user);
       if (password !== user.password) {
         return done(null, false);
       }
-      return done(null, user);
+      return done(null, getMe(user));
     }).
     catch((err) => {
       done(err);
@@ -50,5 +48,18 @@ passport.use('local',
 
   })
 );
+
+function getMe(user) {  
+  var me;
+  if (Array.isArray(user)) 
+    me = Object.assign({}, user[0]); 
+  else 
+    me = Object.assign({}, user);
+  me.apikeys = {
+    "iatacodes": process.env.IATACODES_API_KEY,
+    "google_maps": process.env.GOOGLE_MAPS_CLIENT_KEY
+  }
+  return me; 
+}
 
 module.exports = passport;
