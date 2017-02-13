@@ -55,6 +55,11 @@ function getMe(user) {
     me = Object.assign({}, user[0]); 
   else 
     me = Object.assign({}, user);
+
+  if (me.password) {
+    delete me['password'];
+  }
+  
   me.apikeys = {
     "iatacodes": process.env.IATACODES_API_KEY,
     "google_maps": process.env.GOOGLE_MAPS_CLIENT_KEY

@@ -4,9 +4,10 @@ angular.module('WhereisAdminApp', ['ngMaterial', 'angularMoment']);
 
 angular
 .module('WhereisAdminApp')
-.factory('adminApi', function($http, $mdDialog) {
+.factory('adminApi', function($http, $mdDialog, $q) {
   var svc = this;
   svc.me = {};
+
   svc.login = function(callback) {
     $mdDialog.show({
       controller: LoginDialogController,
@@ -18,8 +19,8 @@ angular
       function(login) {
         $http.
         post('/api/auth', login).
-        then(function(me) {
-          svc.me = me;
+        then(function(response) {
+          svc.me = response.data;
           if (typeof callback == 'function')
             callback(null, svc.me);
         }, function(err) {
@@ -32,6 +33,26 @@ angular
           callback(err);
       }
     );
+  };
+
+  svc.autocompleteAirport = function(query) {
+    var deferred = $q.defer();
+    $http({ 
+      url: '/api/autocomplete/airport',
+      method: 'post',
+      data: { 
+        "query": query
+      }
+    }).
+    then(
+      function(response) {
+        deferred.resolve(response.data);
+      },
+      function(err) {
+        deferred.reject(err);
+      }
+    );
+    return deferred.promise;
   };
 
   svc.sendCommand = function(command, data, callback) {
@@ -74,7 +95,10 @@ angular
 .controller('FlightsCtrl',
   function($scope, $mdToast, $mdDialog, adminApi) {
     var ctrl = this;
+    $scope.from = '';
     $scope.flights = [];
+    $scope.autocompleteAirport = adminApi.autocompleteAirport;
+
     function sendStartFlightCommand(flight) {
       adminApi.sendCommand('startflight', { id: flight.id }, function(err, result) {
         if (err)

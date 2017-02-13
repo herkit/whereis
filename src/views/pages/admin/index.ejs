@@ -32,13 +32,26 @@
     </div>
     <md-icon class="md-secondary" aria-label="Start flight" class="material-icons" ng-click="startFlight(flight)">flight_takeoff</md-icon>
      <md-divider></md-divider>
-    </md-list-item>  
+    </md-list-item>
+    <md-autocomplete md-search-text="from" md-items="airport in autocompleteAirport(from)" md-item-text="airport.name" md-min-length="2">
+      <md-item-template>
+        <span md-highlight-text="from" md-highlight-flags="^i">{{airport.code}} - {{airport.name}}</span>
+      </md-item-template>
+      <md-not-found>
+        No matches found.
+      </md-not-found>
+    </md-autocomplete>
+    <md-autocomplete md-search-text="to" md-items="airport in autocompleteAirport(to)" md-item-text="airport.name" md-min-length="2">
+      <md-item-template>
+        <span md-highlight-text="to" md-highlight-flags="^i">{{airport.code}} - {{airport.name}}</span>
+      </md-item-template>
+      <md-not-found>
+        No matches found.
+      </md-not-found>
+    </md-autocomplete>
+
   </md-list>
-  <md-content  ng-cloak flex-gt-md="33" flex-gt-sm="50" flex>
-    <md-list>
-      <md-list-item ng-repeat="device in devices">
-      </md-list-item>
-    </md-list>
+  <md-content ng-cloak flex-gt-md="33" flex-gt-sm="50" flex>
   </md-content>
 
 </div>

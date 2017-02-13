@@ -6,8 +6,10 @@ var cache = require('./lib/geoloccache'),
     Promise = require('bluebird'),
     db = require('./server/db'),
     model = require('./server/model'),
-    events = require('./events');
+    events = require('./events'),
+    IC = require('./lib/iatacodes');
 
+var ic = new IC(process.env.IATACODES_API_KEY);
 var GoogleMapsAPI = require('googlemaps');
 
 var publicConfig = {
@@ -124,4 +126,31 @@ module.exports = function(app) {
       res.status(500).send(err);
     })
   })
+
+  app.get('/api/flight/getdata', 
+    isAuthenticated, 
+    function(req, res) {
+      ic.api('routes', { flight_number: req.query.flight_number }).
+      then((response) => {
+        res.send(response);
+      }).
+      catch((err) => {
+        res.status(500).send(err);
+      });
+    }
+  )
+
+  app.post('/api/autocomplete/airport', isAuthenticated, 
+    function(req, res) {
+    console.log(req);
+      ic.
+      api('autocomplete', req.body).
+      then((response) => {
+        res.send(response.airports);
+      }).
+      catch((err) => {
+        res.status(404).send(err);
+      })
+    }
+  );
 }

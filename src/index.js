@@ -137,6 +137,7 @@ app.set('view engine', 'ejs');
 app.use(express.static(path.join(__dirname, 'static')));
 app.use(partials());
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded());
 app.use(expressSession({secret: 'mySecretKey'}));
 app.use(passport.initialize());
 app.use(passport.session());
