@@ -1,6 +1,12 @@
 'use strict';
 
-angular.module('WhereisAdminApp', ['ngMaterial', 'angularMoment']);
+angular.module('WhereisAdminApp', [
+  'ngMaterial', 
+  'ngAnimate', 
+  'ngAria', 
+  'ngMessages', 
+  'mdPickers', 
+  'angularMoment']);
 
 angular
 .module('WhereisAdminApp')
@@ -77,14 +83,37 @@ angular
   svc.getFlights = function(callback) {
     $http.
     get('/api/flights').
-    then(function(flights) {
-      callback(null, flights.data);
-    }, function(err) {
-      svc.login(function(err) {
-        if (!err) 
-          svc.getFlights(callback); 
-      });
-    });
+    then(
+      function(flights) {
+        callback(null, flights.data);
+      }, 
+      function(err) {
+        svc.login(
+          function(err) {
+            if (!err) 
+              svc.getFlights(callback); 
+          }
+        );
+      }
+    );
+  }
+
+  svc.addItinerary = function(flight, callback) {
+    $http.
+    post('/api/flights', flight).
+    then(
+      function(result) {
+        callback(null, result.data);
+      },
+      function(err) {
+        svc.login(
+          function(err) {
+            if (!err)
+              svc.addItinerary(flight, callback);
+          }
+        );
+      }
+    );
   }
 
   return svc;
@@ -98,6 +127,7 @@ angular
     $scope.from = '';
     $scope.flights = [];
     $scope.autocompleteAirport = adminApi.autocompleteAirport;
+    $scope.today = Date.now();
 
     function sendStartFlightCommand(flight) {
       adminApi.sendCommand('startflight', { id: flight.id }, function(err, result) {
@@ -131,13 +161,88 @@ angular
       else
         sendStartFlightCommand(flight);
     }
-    adminApi.getFlights(function(err, flights) {
-      console.log(err, flights);
-      if (!err)
-        $scope.flights = flights;
-    });
+    
+    $scope.addItinerary = function() {
+      var flight = {
+        from: $scope.departureAirport.code,
+        to: $scope.arrivalAirport.code,
+        departure: $scope.departureTime.toISOString(),
+        arrival: $scope.arrivalTime.toISOString(),
+      }
+
+      adminApi.addItinerary(
+        flight, 
+        function(err, newFlight) {
+          if (!err) {
+            loadFlights();
+          }
+        }
+      );
+    }
+
+    function loadFlights() {
+      adminApi.getFlights(
+        function(err, flights) {
+          if (!err) {
+            $scope.flights = flights.map(function(flight) {
+              flight.from.localtime = flight.from.timestamp + (flight.from.timezone.dstOffset || 0) + (flight.from.timezone.rawOffset || 0);
+              flight.to.localtime = flight.to.timestamp + (flight.to.timezone.dstOffset || 0) + (flight.to.timezone.rawOffset || 0);
+              flight.duration = flight.to.timestamp - flight.from.timestamp;
+              return flight;
+            });
+          }
+          
+        }
+      );
+    }
+
+    loadFlights();
   }
 );
+
+angular
+.module('WhereisAdminApp')
+.filter('wiTimeSpan', 
+  function() {
+    return function(seconds, padded) {
+      var steps = [
+        { denom: 'd', factor: 86400, modulo: 0 },
+        { denom: 'h', factor: 3600, modulo: 60 },
+        { denom: 'm', factor: 60, modulo: 60 },
+        { denom: 's', factor: 1, modulo: 60 }
+      ];
+
+      var parts = steps.map(
+        (step) => {
+          var val = Math.floor(seconds / step.factor);
+          var strval = val;
+          if (step.modulo > 0)
+          {
+            val = val % step.modulo;
+            if (padded)
+              strval = ('000000' + val).slice(-step.modulo.toString().length);
+            else
+              strval = val;
+          } else {
+            strval = val;
+          }
+
+
+          return { value: val, strval: strval + step.denom };
+        }
+      )
+
+      while(parts[0].value == 0)
+        parts.shift();
+
+      while(parts[parts.length - 1].value == 0)
+        parts.pop();
+
+      return parts.map((part) => { return part.strval; }).join("\u00a0");
+    }
+  }
+);
+
 
 function LoginDialogController($scope, $mdDialog) {
 

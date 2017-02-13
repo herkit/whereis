@@ -81,6 +81,10 @@ module.exports = function(app) {
     debug('new flight', flight);
 
     var placeSearchText = Promise.promisify(gmAPI.placeSearchText, { context: gmAPI });
+    var timezone = Promise.promisify(gmAPI.timezone, { context: gmAPI });
+
+    var departure_timestamp = moment(flight.departure).unix();
+    var arrival_timestamp = moment(flight.arrival).unix();
 
     Promise.all([
       placeSearchText({
@@ -93,27 +97,45 @@ module.exports = function(app) {
       })
     ]).
     spread((fromairport, toairport) => {
-      debug("fromairport", fromairport);
-      debug("toairport", toairport);
+      return {
+        from: fromairport.results[0],
+        to: toairport.results[0]
+      }
+    }).
+    then((airportdata) => {
+      return Promise.all([
+        timezone({ location: airportdata.from.geometry.location.lat + "," + airportdata.from.geometry.location.lng, timestamp: departure_timestamp }),
+        timezone({ location: airportdata.to.geometry.location.lat + "," + airportdata.to.geometry.location.lng, timestamp: arrival_timestamp })
+      ]).
+      spread((fromtimezone, totimezone) => {
+        airportdata.from.timezone = fromtimezone;
+        airportdata.to.timezone = totimezone;
+        return airportdata;
+      })
+    }).
+    then((airportdata) => {
       return {
         from: {
-          name: fromairport.results[0].name,
+          name: airportdata.from.name,
           code: flight.from,
-          location: fromairport.results[0].geometry.location,
-          timestamp: moment(flight.departure).unix()
+          location: airportdata.from.geometry.location,
+          timestamp: departure_timestamp - (airportdata.from.timezone.dstOffset + airportdata.from.timezone.rawOffset),
+          timezone: airportdata.from.timezone
         },
         to: {
-          name: toairport.results[0].name,
+          name: airportdata.to.name,
           code: flight.to,
-          location: toairport.results[0].geometry.location,
-          timestamp: moment(flight.arrival).unix()
+          location: airportdata.to.geometry.location,
+          timestamp: arrival_timestamp - (airportdata.to.timezone.dstOffset + airportdata.to.timezone.rawOffset),
+          timezone: airportdata.to.timezone
         }
       }
     }).
     then((flightdata) => {
-      flightdata.createdby = req.user.id;
+      flightdata.created_by = req.user.id;
       db.insert(model.flatten(flightdata)).into('flights').returning('id').then(function(record) {
         flightdata.id = record[0]
+        events.emit('created:flight');
         res.status(200).send(flightdata);  
       }).
       catch((err) => {
