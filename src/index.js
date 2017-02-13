@@ -40,7 +40,7 @@ events.on('command:startflight', function(data) {
     var flightTime = flightData.to.timestamp - flightData.from.timestamp;
     flightData.from.timestamp = Date.now() / 1000;
     flightData.to.timestamp = flightData.from.timestamp + flightTime;
-    log.debug(flightData);
+    log.debug('command:startflight', flightData);
     io.emit('flight', flightData);
   })
 })
@@ -78,7 +78,7 @@ map(function(record) {
 io.on('connection', function(socket) {
   if (history.length > 0) {
     var current = history.slice(-1).pop();
-    log.debug("socket.io connected sending last known position");
+    log.debug("socket.io connected sending last known position", current);
     emitTrack(socket, current);
   }
 })

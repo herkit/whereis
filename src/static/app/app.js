@@ -2,8 +2,12 @@ var whereis = {
   me: {
 
   },
+  mode: {
+    TRACKING: 'tracking',
+    FLIGHT: 'flight'
+  },
   tracking: {
-    mode: 'tracking',
+    mode: undefined,
     data: {},
     mapFollow: true,
     flightsim: {}
@@ -46,6 +50,7 @@ var locationDiv;
 var socket;
 
 function initialize() {
+  whereis.tracking.mode = whereis.mode.TRACKING;
   google.maps.visualRefresh = true;
   var isMobile = (navigator.userAgent.toLowerCase().indexOf('android') > -1) ||
     (navigator.userAgent.match(/(iPod|iPhone|iPad|BlackBerry|Windows Phone|iemobile)/));
@@ -88,31 +93,21 @@ function initialize() {
       locationDiv.innerHTML = html;
     }
 
-    if (!whereis.me.marker) {
-      whereis.me.marker = new google.maps.Marker({ 
-        icon: whereis.icons.harley,
-        position: latlng, 
-        animation: google.maps.Animation.DROP,
-        map: whereis.map
-      });
-      whereis.map.setCenter(latlng);
-    } else {
-      if (!onflight) {
-        setMyPosition(latlng);
-        if (positions.length >= 2) {
-          var trackingPathCoordinates = positions.slice(-20).map(function(position) { return { lat: position.lat, lng: position.lon }});
-          if(!trackingPath) {
-            trackingPath = new google.maps.Polyline({
-              path: trackingPathCoordinates,
-              geodesic: true,
-              strokeColor: '#0000FF',
-              strokeOpacity: 0.75,
-              strokeWeight: 4
-            });
-            trackingPath.setMap(whereis.map);
-          } else {
-            trackingPath.setPath(trackingPathCoordinates);
-          }
+    if (whereis.tracking.mode == whereis.mode.TRACKING) {
+      setMyPosition(latlng, whereis.icons.harley);
+      if (positions.length >= 2) {
+        var trackingPathCoordinates = positions.slice(-20).map(function(position) { return { lat: position.lat, lng: position.lon }});
+        if(!trackingPath) {
+          trackingPath = new google.maps.Polyline({
+            path: trackingPathCoordinates,
+            geodesic: true,
+            strokeColor: '#0000FF',
+            strokeOpacity: 0.75,
+            strokeWeight: 4
+          });
+          trackingPath.setMap(whereis.map);
+        } else {
+          trackingPath.setPath(trackingPathCoordinates);
         }
       }
     }
@@ -121,15 +116,28 @@ function initialize() {
   });
 }
 
-function setMyPosition(latlng) {
+function setMyPosition(latlng, icon) {
+  if (!whereis.me.marker) {
+    whereis.me.marker = new google.maps.Marker({ 
+      icon: icon,
+      position: latlng, 
+      animation: google.maps.Animation.DROP,
+      map: whereis.map
+    });
+    whereis.me.marker.setMap(whereis.map);
+  }
+  if (icon && whereis.me.marker.icon !== icon) {
+    whereis.me.marker.setIcon(icon);
+  }
   whereis.me.marker.setPosition(latlng);
   if (whereis.tracking.mapFollow)
     whereis.map.setCenter(latlng);
 }
 
-function setMapFollow() {
-  whereis.tracking.mapFollow = true;
-  whereis.map.setCenter(whereis.me.marker.position);
+function setMapFollow(follow) {
+  whereis.tracking.mapFollow = follow;
+  if (follow)
+    whereis.map.setCenter(whereis.me.marker.position);
 }
 
 function zoomToObject(obj){

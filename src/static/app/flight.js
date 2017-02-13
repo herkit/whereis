@@ -44,7 +44,7 @@
 
       var currentTime = Date.now() / 1000;
       if (currentTime > flightdata.from.timestamp) {
-        whereis.tracking.mode = "flight";
+        whereis.tracking.mode = whereis.mode.FLIGHT;
 
         whereis.tracking.flightsim.startLatLon = new LatLon(whereis.tracking.flightsim.flightdata.from.location.lat, whereis.tracking.flightsim.flightdata.from.location.lng);
         whereis.tracking.flightsim.endLatLon = new LatLon(whereis.tracking.flightsim.flightdata.to.location.lat, whereis.tracking.flightsim.flightdata.to.location.lng);
@@ -72,11 +72,6 @@
             }, 10);
             onflight = false;
           }
-          if (onflight)
-            whereis.me.marker.setIcon(whereis.icons.plane);
-          else 
-            whereis.me.marker.setIcon(whereis.icons.harley);
-
           whereis.tracking.flightsim.
           flightPathSoFar.
           setPath([
@@ -84,9 +79,9 @@
             whereis.tracking.flightsim.currentLatLon.toLatLng()
           ]);
 
-          setMyPosition(whereis.tracking.flightsim.currentLatLon.toLatLng());
+          setMyPosition(whereis.tracking.flightsim.currentLatLon.toLatLng(), whereis.icons.plane);
           if (currentTime > whereis.tracking.flightsim.endTime) {
-            whereis.tracking.mode = 'tracking';
+            whereis.tracking.mode = whereis.mode.TRACKING;
             cancelInterval(whereis.tracking.flightsim.interval);
           }
         }, 500);
