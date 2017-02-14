@@ -46,7 +46,7 @@ then(() =>
       then((records) => {
         var flightData = model.restructure(records[0]);
         var flightTime = flightData.to.timestamp - flightData.from.timestamp;
-        flightData.from.timestamp = Date.now() / 1000;
+        flightData.from.timestamp = Date.getUtcTimestamp();
         flightData.to.timestamp = flightData.from.timestamp + flightTime;
 
         log.debug('command:startflight', flightData);
@@ -59,9 +59,10 @@ then(() =>
       current.state = 'flight';
       current.data = flight;
       current.stateTimeout = setTimeout(function() {
+        var toLoc = current.data.to.location;
         log.debug('Exiting flightmode');
         current.state = 'track';
-        current.data = { geo: current.data.to.location };
+        current.data = { geo: { lat: toLoc.latitude, lng: toLoc.longitude }, address: { address: current.data.to.name } };
         emitCurrent();
       }, (flight.to.timestamp - Date.getUtcTimestamp()) * 1000);      
       emitCurrent();

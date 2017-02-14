@@ -7,9 +7,35 @@
     return Math.floor(now.getTime() / 1000 + now.getTimezoneOffset() * 60);
   }
 
+
+  google.maps.Polyline.prototype.fadeOut = function(seconds, callback) {
+    var polyline = this;
+    var stroke = (this.strokeOpacity*50)/(seconds*999),
+        fadeout = setInterval(
+          function() {
+            if (polyline.strokeOpacity <= 0.0) {
+              clearInterval(fadeout);
+              polyline.setVisible(false);
+              if (typeof (callback) === 'function')
+                callback();
+              return;
+            }
+            polyline.setOptions({
+                'strokeOpacity': Math.max(0, polyline.strokeOpacity-stroke)
+            });
+          }, 
+          50
+        );
+  }
+ 
   function initialize() {
 
     window.socket.on('flight', function(flightdata) {
+
+      var locationDiv = document.getElementById('currentLocation');
+      var html = '<h1>' + flightdata.from.name +  ' - ' + flightdata.to.name + '</h1>';
+      locationDiv.innerHTML = html;
+
       if (!whereis.tracking.flightsim)
         whereis.tracking.flightsim = {};
       whereis.tracking.flightsim.flightdata = flightdata;
@@ -66,15 +92,7 @@
             whereis.tracking.flightsim.currentLatLon = whereis.tracking.flightsim.endLatLon;
 
             whereis.tracking.flightsim.currentPath.setMap(null);
-            var flightPathFadeInterval = setInterval(function() {
-              whereis.tracking.flightsim.flightPathSoFar.setOptions({
-                strokeOpacity: whereis.tracking.flightsim.flightPathSoFar.strokeOpacity - 0.01
-              })
-              if (whereis.tracking.flightsim.flightPathSoFar.strokeOpacity <= 0) {
-                whereis.tracking.flightsim.flightPathSoFar.setMap(null);
-                clearInterval(flightPathFadeInterval);
-              }
-            }, 10);
+            whereis.tracking.flightsim.flightPathSoFar.fadeOut(1);
             onflight = false;
           }
           whereis.tracking.flightsim.
