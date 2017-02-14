@@ -2,6 +2,11 @@
     return { lat: this.lat, lng: this.lon };
   }
 
+  Date.getUtcTimestamp = function() {
+    var now = new Date();
+    return Math.floor(now.getTime() / 1000 + now.getTimezoneOffset() * 60);
+  }
+
   function initialize() {
 
     window.socket.on('flight', function(flightdata) {
@@ -42,7 +47,7 @@
       
       whereis.tracking.flightsim.flightTime = flightdata.to.timestamp - flightdata.from.timestamp;
 
-      var currentTime = Date.now() / 1000;
+      var currentTime = Date.getUtcTimestamp();
       if (currentTime > flightdata.from.timestamp) {
         whereis.tracking.mode = whereis.mode.FLIGHT;
 
@@ -51,7 +56,7 @@
         whereis.tracking.flightsim.currentLatLon = new LatLon(whereis.tracking.flightsim.flightdata.from.location.lat, whereis.tracking.flightsim.flightdata.from.location.lng);
 
         whereis.tracking.flightsim.interval = setInterval(function() {
-          currentTime = Date.now() / 1000;
+          currentTime = Date.getUtcTimestamp();
           var progress = (currentTime - whereis.tracking.flightsim.startTime) / whereis.tracking.flightsim.flightTime;
           if (currentTime < whereis.tracking.flightsim.endTime) {
             whereis.tracking.flightsim.currentLatLon = whereis.tracking.flightsim.startLatLon.intermediatePointTo(whereis.tracking.flightsim.endLatLon, progress);
@@ -67,7 +72,7 @@
               })
               if (whereis.tracking.flightsim.flightPathSoFar.strokeOpacity <= 0) {
                 whereis.tracking.flightsim.flightPathSoFar.setMap(null);
-                cancelInterval(flightPathFadeInterval);
+                clearInterval(flightPathFadeInterval);
               }
             }, 10);
             onflight = false;
@@ -82,7 +87,7 @@
           setMyPosition(whereis.tracking.flightsim.currentLatLon.toLatLng(), whereis.icons.plane);
           if (currentTime > whereis.tracking.flightsim.endTime) {
             whereis.tracking.mode = whereis.mode.TRACKING;
-            cancelInterval(whereis.tracking.flightsim.interval);
+            clearInterval(whereis.tracking.flightsim.interval);
           }
         }, 500);
 
