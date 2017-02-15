@@ -98,6 +98,27 @@ angular
     );
   }
 
+  svc.getFlightInfo = function(flightNumber, callback) {
+    $http({
+      url: '/api/flights/getdata',
+      method: 'get',
+      params: { flight_number: flightNumber }
+    }).
+    then(
+      function(data) {
+        callback(null, data);
+      },
+      function(err) {
+        svc.login(
+          function(err) {
+            if (!err) 
+              svc.getFlightInfo(flightNumber, callback); 
+          }
+        ); 
+      }
+    );
+  }
+
   svc.addItinerary = function(flight, callback) {
     $http.
     post('/api/flights', flight).
@@ -128,6 +149,8 @@ angular
     $scope.flights = [];
     $scope.autocompleteAirport = adminApi.autocompleteAirport;
     $scope.today = Date.now();
+    /*$scope.departureAirport = { code: '', name: '' };
+    $scope.arrivalAirport = { code: '', name: '' };*/
 
     function sendStartFlightCommand(flight) {
       adminApi.sendCommand('startflight', { id: flight.id }, function(err, result) {
@@ -164,6 +187,8 @@ angular
     
     $scope.addItinerary = function() {
       var flight = {
+        flight_number: $scope.flightnumber,
+        airline: $scope.airline,
         from: $scope.departureAirport.code,
         to: $scope.arrivalAirport.code,
         departure: $scope.departureTime.toISOString(),
@@ -178,6 +203,23 @@ angular
           }
         }
       );
+    }
+
+    $scope.loadFlightData = function(flightNumber) {
+      adminApi.getFlightInfo(flightNumber, function(err, info) {
+        if (!err)
+        {
+          $scope.departureAirportName = info.data[0].departure;
+          $scope.departureAirport = $scope.departureAirport || {};
+          $scope.departureAirport.code = info.data[0].departure;
+          $scope.departureAirport.name = info.data[0].departure;
+          $scope.arrivalAirportName = info.data[0].arrival;
+          $scope.arrivalAirport = $scope.arrivalAirport || {};
+          $scope.arrivalAirport.code = info.data[0].arrival;
+          $scope.arrivalAirport.name = info.data[0].arrival;
+          $scope.airline = info.data[0].airline[0];
+        }
+      })
     }
 
     function loadFlights() {

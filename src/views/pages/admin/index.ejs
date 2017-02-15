@@ -13,43 +13,67 @@
 </md-toolbar>
 
 <div layout="column" layout-gt-sm="row" flex  ng-controller="FlightsCtrl">
-  <md-list ng-cloak flex-gt-sm="50" flex-gt-xl="33">
-    <md-list-item ng-repeat="flight in flights">
-    <div layout="row" flex="90">
-      <div flex="40" class="flightinfo">
-        <div class="name">{{flight.from.name}}</div>
-        <div class="iata" flex>{{flight.from.code}}</div>
-        <div class="date">{{flight.from.localtime | amFromUnix | amDateFormat:'DD. MMM'}}</div>
-        <div class="time">{{flight.from.localtime | amFromUnix | amDateFormat:'HH:mm'}}</div>
+  <div ng-cloak flex-gt-sm="50" flex-gt-xl="33" class="md-padding">
+    <h3>Upcoming flights</h3>
+
+    <md-list>
+      <md-list-item ng-repeat="flight in flights">
+      <div layout="row" flex="90">
+        <div flex="40" class="flightinfo">
+          <div class="name">{{flight.from.name}}</div>
+          <div class="iata" flex>{{flight.from.code}}</div>
+          <div class="date">{{flight.from.localtime | amFromUnix | amDateFormat:'DD. MMM'}}</div>
+          <div class="time">{{flight.from.localtime | amFromUnix | amDateFormat:'HH:mm'}}</div>
+        </div>
+        <md-icon class="material-icons rotate90">flight</md-icon>
+        <div flex="40" layout="column" class="flightinfo">
+          <div class="name">{{flight.to.name}}</div>
+          <div class="iata"flex>{{flight.to.code}}</div>
+          <div class="date">{{flight.to.localtime | amFromUnix | amDateFormat:'DD. MMMM'}}</div>
+          <div class="time">{{flight.to.localtime | amFromUnix | amDateFormat:'HH:mm'}}</div>
+        </div>
+        <div class="flightinfo" flex="15" hide-xs>
+          <div class="time" style="text-align: right">{{ flight.duration | wiTimeSpan }}</div>
+        </div>
       </div>
-      <md-icon class="material-icons rotate90">flight</md-icon>
-      <div flex="40" layout="column" class="flightinfo">
-        <div class="name">{{flight.to.name}}</div>
-        <div class="iata"flex>{{flight.to.code}}</div>
-        <div class="date">{{flight.to.localtime | amFromUnix | amDateFormat:'DD. MMMM'}}</div>
-        <div class="time">{{flight.to.localtime | amFromUnix | amDateFormat:'HH:mm'}}</div>
-      </div>
-      <div class="flightinfo" flex="15" hide-xs>
-        <div class="time" style="text-align: right">{{ flight.duration | wiTimeSpan }}</div>
-      </div>
-    </div>
-    <md-icon class="md-secondary" aria-label="Start flight" class="material-icons" ng-click="startFlight(flight)">flight_takeoff</md-icon>
-     <md-divider></md-divider>
-    </md-list-item>
-  </md-list>
+      <md-icon class="md-secondary" aria-label="Start flight" class="material-icons" ng-click="startFlight(flight)">flight_takeoff</md-icon>
+       <md-divider></md-divider>
+      </md-list-item>
+    </md-list>
+  </div>
 
   <div layout="column">
     <form name="newFlightForm">
+    <div class="md-padding">
+      <h3>New flight</h3>
+      <div layout="row">
+        <md-input-container>
+            <label>Flight number</label>
+            <input ng-model="flightnumber" />
+        </md-input-container>
+        <div style="margin: 18px 0px 18px 0px">
+          <md-button class="md-icon-button" aria-label="Load data" ng-click="loadFlightData(flightnumber)">
+            <md-icon class="material-icon">input</md-icon>
+          </md-button>
+        </div>
+      </div>
+      <md-input-container>
+        <label>Airline name</label>
+        <input ng-model="airline.name" />
+      </md-input-container>
+    </div>
+
     <div layout="row">
       <div class="md-padding">
-        <md-input-container class="md-block" flex-gt-xs>
-            <label>Flight number</label>
-            <input ng-model="flightnumber">
-            <md-button>Load data</md-button>
-          </md-input-container>
-
-        <h3>Departure</h3>
-        <md-autocomplete md-search-text="departureAirportName" placeholder="Airport" md-items="airport in autocompleteAirport(departureAirportName)" md-item-text="airport.name" md-selected-item="departureAirport"  md-min-length="2" required>
+        <h4>Departure</h4>
+        <md-autocomplete 
+          md-selected-item="departureAirport" 
+          md-search-text="departureAirportName" 
+          placeholder="Airport" 
+          md-items="airport in autocompleteAirport(departureAirportName)" md-item-text="airport.name" 
+          md-min-length="2"
+          md-floating-label="Airport"
+          required>
           <md-item-template>
             <span md-highlight-text="from" md-highlight-flags="^i">{{airport.code}} - {{airport.name}}</span>
           </md-item-template>
@@ -75,8 +99,16 @@
         </mdp-time-picker>
       </div>
       <div class="md-padding">
-        <h3>Arrival</h3>
-        <md-autocomplete md-selected-item="arrivalAirport" md-search-text="arrivalAirportName" placeholder="Airport" md-items="airport in autocompleteAirport(arrivalAirportName)" md-item-text="airport.name" md-min-length="2" required>
+        <h4>Arrival</h4>
+        <md-autocomplete 
+          md-selected-item="arrivalAirport" 
+          md-search-text="arrivalAirportName" 
+          placeholder="Airport" 
+          md-items="airport in autocompleteAirport(arrivalAirportName)" 
+          md-item-text="airport.name" 
+          md-min-length="2" 
+          md-floating-label="Airport"
+          required>
           <md-item-template>
             <span md-highlight-text="to" md-highlight-flags="^i">{{airport.code}} - {{airport.name}}</span>
           </md-item-template>
