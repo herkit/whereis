@@ -32,15 +32,15 @@
 
     window.socket.on('flight', function(flightdata) {
 
-      var locationDiv = document.getElementById('currentLocation');
-      var html = '<h1>' + flightdata.from.name +  ' - ' + flightdata.to.name + '</h1>';
-      locationDiv.innerHTML = html;
+      setLocationData([flightdata.flightnumber, flightdata.from.name +  ' to ' + flightdata.to.name, flightdata.airline.name]);
 
       if (!whereis.tracking.flightsim)
         whereis.tracking.flightsim = {};
+      whereis.tracking.mode = whereis.mode.FLIGHT;
       whereis.tracking.flightsim.flightdata = flightdata;
       whereis.tracking.flightsim.startTime = flightdata.from.timestamp;
       whereis.tracking.flightsim.endTime = flightdata.to.timestamp;
+      showPoweredBy();
 
       whereis.tracking.flightsim.flightPlan = [flightdata.from.location, flightdata.to.location];
       if (!whereis.tracking.flightsim.currentPath)
@@ -73,16 +73,15 @@
       
       whereis.tracking.flightsim.flightTime = flightdata.to.timestamp - flightdata.from.timestamp;
 
-      var currentTime = Date.getUtcTimestamp();
-      if (currentTime > flightdata.from.timestamp) {
-        whereis.tracking.mode = whereis.mode.FLIGHT;
+      whereis.tracking.flightsim.startLatLon = new LatLon(whereis.tracking.flightsim.flightdata.from.location.lat, whereis.tracking.flightsim.flightdata.from.location.lng);
+      whereis.tracking.flightsim.endLatLon = new LatLon(whereis.tracking.flightsim.flightdata.to.location.lat, whereis.tracking.flightsim.flightdata.to.location.lng);
+      whereis.tracking.flightsim.currentLatLon = new LatLon(whereis.tracking.flightsim.flightdata.from.location.lat, whereis.tracking.flightsim.flightdata.from.location.lng);
 
-        whereis.tracking.flightsim.startLatLon = new LatLon(whereis.tracking.flightsim.flightdata.from.location.lat, whereis.tracking.flightsim.flightdata.from.location.lng);
-        whereis.tracking.flightsim.endLatLon = new LatLon(whereis.tracking.flightsim.flightdata.to.location.lat, whereis.tracking.flightsim.flightdata.to.location.lng);
-        whereis.tracking.flightsim.currentLatLon = new LatLon(whereis.tracking.flightsim.flightdata.from.location.lat, whereis.tracking.flightsim.flightdata.from.location.lng);
+      setMyPosition(whereis.tracking.flightsim.currentLatLon.toLatLng(), whereis.icons.plane)
 
-        whereis.tracking.flightsim.interval = setInterval(function() {
-          currentTime = Date.getUtcTimestamp();
+      whereis.tracking.flightsim.interval = setInterval(function() {
+        var currentTime = Date.getUtcTimestamp();
+        if (currentTime >= whereis.tracking.flightsim.flightdata.from.timestamp) {
           var progress = (currentTime - whereis.tracking.flightsim.startTime) / whereis.tracking.flightsim.flightTime;
           if (currentTime < whereis.tracking.flightsim.endTime) {
             whereis.tracking.flightsim.currentLatLon = whereis.tracking.flightsim.startLatLon.intermediatePointTo(whereis.tracking.flightsim.endLatLon, progress);
@@ -107,10 +106,8 @@
             whereis.tracking.mode = whereis.mode.TRACKING;
             clearInterval(whereis.tracking.flightsim.interval);
           }
-        }, 500);
-
-        onflight = true;
-      }
+        }
+      }, 500);
     });  
   }
   google.maps.event.addDomListener(window, 'load', initialize);

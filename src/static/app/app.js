@@ -1,6 +1,34 @@
+function logoPoweredBy(logofile, title) {
+  return '<div style="font-size:0.9em; cursor: pointer;"> \
+           <span style="font-size:0.8em; color:BLACK; cursor: hand; opacity: 0.6; filter: alpha(opacity=60); text-shadow: -2px 0 #FFF, 0 2px #FFF, 2px 0 #FFF, 0 -2px #FFF;">Powered by</span><br/> \
+           <img src="img/' + logofile + '" title="' + title + '" style="height:24px; width: auto" /> \
+           </div>';
+}
+
 var whereis = {
   me: {
 
+  },
+  poweredby: {
+    flight: {
+      _:  '<div style="font-size:0.9em; cursor: pointer;"> \
+           <span style="font-size:0.8em; color:BLACK; cursor: hand; opacity: 0.6; filter: alpha(opacity=60); text-shadow: -2px 0 #FFF, 0 2px #FFF, 2px 0 #FFF, 0 -2px #FFF;">Powered by an airplane</span> \
+           </div>',
+      dy: logoPoweredBy('airline/dy.png', 'Norwegian Airlines'),
+      sk: logoPoweredBy('airline/sk.svg', 'Scandinavian Airlines'),
+      aa: logoPoweredBy('airline/aa.svg', 'American Airlines'),
+      dl: logoPoweredBy('airline/dl.svg', 'Delta'),
+      aa: logoPoweredBy('airline/ua.svg', 'United Airlines'),
+      aa: logoPoweredBy('airline/wn.svg', 'Southwest Airlines'),
+      aa: logoPoweredBy('airline/b6.svg', 'JetBlue')
+    },
+    tracking: {
+      _:  
+        '<div style="font-size:0.9em; cursor: pointer;"> \
+        <span style="font-size:0.8em; color:BLACK; cursor: hand; opacity: 0.6; filter: alpha(opacity=60); text-shadow: -2px 0 #FFF, 0 2px #FFF, 2px 0 #FFF, 0 -2px #FFF;">Powered by</span><br/> \
+        <img src="img/wherever.png" style="height:24px; width: auto" /> \
+        </div>'
+    }
   },
   mode: {
     TRACKING: 'tracking',
@@ -84,13 +112,9 @@ function initialize() {
         gps.address.address, 
         gps.address.state_long || gps.address.state, 
         gps.address.country_long || gps.address.country
-      ].filter(function(item) { return (item !== undefined); });
+      ];
 
-      var html = '<h1>' + parts.shift() + '</h1>';
-      if(parts.length > 0) {
-        html = html + '<span class="sub">' + parts.join(', ') + '</span>';
-      }
-      locationDiv.innerHTML = html;
+      setLocationData(parts);
     }
 
     if (whereis.tracking.mode == whereis.mode.TRACKING) {
@@ -140,6 +164,15 @@ function setMapFollow(follow) {
     whereis.map.setCenter(whereis.me.marker.position);
 }
 
+function setLocationData(locationdata) {
+  var parts = locationdata.filter(function(item) { return (item !== undefined); })
+  var html = '<h1>' + parts.shift() + '</h1>';
+  if(parts.length > 0) {
+    html = html + '<span class="sub">' + parts.join(', ') + '</span>';
+  }
+  locationDiv.innerHTML = html;
+}
+
 function zoomToObject(obj){
     var bounds = new google.maps.LatLngBounds();
     var points = obj.getPath().getArray();
@@ -155,11 +188,16 @@ google.maps.event.addDomListener(window, 'load', initialize);
 function showPoweredBy() {
   credits = document.getElementById('poweredby');
 
-  small_credits = '\
-    <div style="font-size:0.9em; cursor: pointer;"> \
-    <span style="font-size:0.8em; color:BLACK; cursor: hand; opacity: 0.6; filter: alpha(opacity=60); text-shadow: -2px 0 #FFF, 0 2px #FFF, 2px 0 #FFF, 0 -2px #FFF;">Powered by</span><br/> \
-    <img src="img/wherever.png" style="height:24px; width: auto" /> \
-    </div>';
+  small_credits = '';
+  if (whereis.tracking.mode === whereis.mode.TRACKING) {
+    small_credits = whereis.poweredby.tracking._;  
+  } else if (whereis.tracking.mode === whereis.mode.FLIGHT) {
+    small_credits = whereis.poweredby.flight._;
+    var airlinecode = whereis.tracking.flightsim.flightdata.airline.code.toLowerCase();
+    if (whereis.poweredby.flight[airlinecode]) {
+      small_credits = whereis.poweredby.flight[airlinecode];
+    }
+  }
 
   credits.innerHTML = small_credits;
   credits.style.fontSize = '1em';
