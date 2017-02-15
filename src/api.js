@@ -149,14 +149,25 @@ module.exports = function(app) {
     })
   })
 
-  app.get('/api/flight/getdata', 
+  app.get('/api/flights/getdata', 
     isAuthenticated, 
     function(req, res) {
       ic.api('routes', { flight_number: req.query.flight_number }).
-      then((response) => {
-        res.send(response);
+      then((routedata) => {
+        ic.api('airlines', { code: req.query.flight_number.slice(0, 2) }).
+        then(function(airlinedata) {
+          routedata.forEach(function(route) {
+            route.airline = airlinedata;
+          })
+          res.send(routedata);
+        }).
+        catch(function(err) {
+          debug('Unable to get airline data', err);
+          res.send(routedata);
+        });
       }).
       catch((err) => {
+        debug('Unable to get flight data', err);
         res.status(500).send(err);
       });
     }

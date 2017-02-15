@@ -42,6 +42,12 @@
     <form name="newFlightForm">
     <div layout="row">
       <div class="md-padding">
+        <md-input-container class="md-block" flex-gt-xs>
+            <label>Flight number</label>
+            <input ng-model="flightnumber">
+            <md-button>Load data</md-button>
+          </md-input-container>
+
         <h3>Departure</h3>
         <md-autocomplete md-search-text="departureAirportName" placeholder="Airport" md-items="airport in autocompleteAirport(departureAirportName)" md-item-text="airport.name" md-selected-item="departureAirport"  md-min-length="2" required>
           <md-item-template>

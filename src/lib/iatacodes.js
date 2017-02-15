@@ -1,5 +1,6 @@
 var Promise = require('bluebird'),
     request = require('request'),
+    debug = require('debug')('whereis:iatacodes'),
     _ = require('lodash');
 
 class IC {
@@ -8,8 +9,7 @@ class IC {
       this.url = `https://iatacodes.org/api/v${version}/`;
   }
   api(method='ping', params={}, callback) {
-    console.log(params);
-    console.log(_.extend({api_key: this.api_key}, params));
+    debug('iatacodes api params', _.extend({api_key: this.api_key}, params));
     return new Promise((resolve, reject) => {
       request.post({
           url : `${this.url}${method}.json`,
@@ -19,6 +19,7 @@ class IC {
           if (!body) return reject(new Error('Empty response'));
           var result = JSON.parse(body);
           if (!result.response) return reject(new Error('Empty response'));
+          debug('response:', result.response);
           resolve(result.response);
       });
     })
