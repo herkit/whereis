@@ -1,0 +1,95 @@
+    <form name="newFlightForm">
+    <div class="md-padding">
+      <h3>New flight</h3>
+      <div layout="row">
+        <md-input-container>
+            <label>Flight number</label>
+            <input ng-model="flightnumber" />
+        </md-input-container>
+        <div style="margin: 18px 0px 18px 0px">
+          <md-button class="md-icon-button" aria-label="Load data" ng-click="loadFlightData(flightnumber)">
+            <md-icon class="material-icon">input</md-icon>
+          </md-button>
+        </div>
+      </div>
+      <md-input-container>
+        <label>Airline name</label>
+        <input ng-model="airline.name" />
+      </md-input-container>
+    </div>
+
+    <div layout="row">
+      <div class="md-padding">
+        <h4>Departure</h4>
+        <md-autocomplete 
+          md-selected-item="departureAirport" 
+          md-search-text="departureAirportName" 
+          placeholder="Airport" 
+          md-items="airport in autocompleteAirport(departureAirportName)" md-item-text="airport.name" 
+          md-min-length="2"
+          md-floating-label="Airport"
+          required>
+          <md-item-template>
+            <span md-highlight-text="from" md-highlight-flags="^i">{{airport.code}} - {{airport.name}}</span>
+          </md-item-template>
+          <md-not-found>
+            No matches found.
+          </md-not-found>
+        </md-autocomplete>
+
+        <mdp-date-picker name="departureDate" mdp-placeholder="Date" mdp-min-date="departureMinDate" mdp-max-date="departureMaxDate" ng-model="departureTime" required>
+          <div ng-messages="newFlightForm.departureDate.$error">
+            <div ng-message="required">This is required</div>
+            <div ng-message="format">Invalid format</div>
+            <div ng-message="minDate">Min date</div>
+            <div ng-message="maxDate">Max date</div>
+          </div>
+        </mdp-date-picker>
+
+        <mdp-time-picker name="dpartureTime" mdp-auto-switch="true" mdp-placeholder="Airport local time" ng-model="departureTime" mdp-format="HH:mm" required>
+          <div ng-messages="newFlightForm.departureTime.$error">
+            <div ng-message="required">This is required</div>
+            <div ng-message="format">Invalid format</div>
+          </div>
+        </mdp-time-picker>
+      </div>
+      <div class="md-padding">
+        <h4>Arrival</h4>
+        <md-autocomplete 
+          md-selected-item="arrivalAirport" 
+          md-search-text="arrivalAirportName" 
+          placeholder="Airport" 
+          md-items="airport in autocompleteAirport(arrivalAirportName)" 
+          md-item-text="airport.name" 
+          md-min-length="2" 
+          md-floating-label="Airport"
+          required>
+          <md-item-template>
+            <span md-highlight-text="to" md-highlight-flags="^i">{{airport.code}} - {{airport.name}}</span>
+          </md-item-template>
+          <md-not-found>
+            No matches found.
+          </md-not-found>
+        </md-autocomplete>
+
+        <mdp-date-picker name="arrivalDate" mdp-placeholder="Date" mdp-min-date="arrivalMinDate" ng-model="arrivalTime" required>
+          <div ng-messages="newFlightForm.arrivalDate.$error">
+            <div ng-message="required">This is required</div>
+            <div ng-message="format">Invalid format</div>
+            <div ng-message="minDate">Min date</div>
+            <div ng-message="maxDate">Max date</div>
+          </div>
+        </mdp-date-picker>
+
+        <mdp-time-picker name="arrivalTime" mdp-auto-switch="true" mdp-placeholder="Airport local time" ng-model="arrivalTime" mdp-format="HH:mm">
+          <div ng-messages="newFlightForm.arrivalTime.$error">
+            <div ng-message="required">This is required</div>
+            <div ng-message="format">Invalid format</div>
+          </div>
+        </mdp-time-picker>
+      </div>
+    </div>
+    <div>
+      <md-button class="md-raised md-primary" ng-click="addItinerary()">Add to itinerary</md-button>
+    </div>
+    </form>

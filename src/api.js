@@ -128,7 +128,9 @@ module.exports = function(app) {
           location: airportdata.to.geometry.location,
           timestamp: arrival_timestamp - (airportdata.to.timezone.dstOffset + airportdata.to.timezone.rawOffset),
           timezone: airportdata.to.timezone
-        }
+        },
+        airline: flight.airline,
+        flightnumber: flight.flightnumber
       }
     }).
     then((flightdata) => {

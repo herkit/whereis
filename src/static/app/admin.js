@@ -187,7 +187,7 @@ angular
     
     $scope.addItinerary = function() {
       var flight = {
-        flight_number: $scope.flightnumber,
+        flightnumber: $scope.flightnumber,
         airline: $scope.airline,
         from: $scope.departureAirport.code,
         to: $scope.arrivalAirport.code,
@@ -203,6 +203,25 @@ angular
           }
         }
       );
+    }
+
+    $scope.newFlight = function() {
+      $mdDialog.show({
+        controller: AddFlightDialogController,
+        templateUrl: '/app/dialogs/addflight/addflight.html',
+        parent: angular.element(document.body),
+        clickOutsideToClose:true
+      })
+      .then(
+        function(newFlight) {
+          loadFlights();
+          $mdToast.show($mdToast.simple().textContent("Flight added"));
+        },
+        function() {
+          $mdToast.show($mdToast.simple().textContent("Add flight canceled"));
+        }
+      )
+
     }
 
     $scope.loadFlightData = function(flightNumber) {
