@@ -137,7 +137,7 @@ module.exports = function(app) {
       flightdata.created_by = req.user.id;
       db.insert(model.flatten(flightdata)).into('flights').returning('id').then(function(record) {
         flightdata.id = record[0]
-        events.emit('created:flight');
+        events.emit('created:flight', flightdata);
         res.status(200).send(flightdata);  
       }).
       catch((err) => {

@@ -29,7 +29,7 @@ function AddFlightDialogController($scope, $mdToast, $mdDialog, adminApi) {
 
   $scope.loadFlightData = function(flightNumber) {
     adminApi.getFlightInfo(flightNumber, function(err, info) {
-      if (!err)
+      if (!err && info.data.length > 0)
       {
         $scope.departureAirportName = info.data[0].departure;
         $scope.departureAirport = $scope.departureAirport || {};
@@ -40,6 +40,13 @@ function AddFlightDialogController($scope, $mdToast, $mdDialog, adminApi) {
         $scope.arrivalAirport.code = info.data[0].arrival;
         $scope.arrivalAirport.name = info.data[0].arrival;
         $scope.airline = info.data[0].airline[0];
+      } else {
+        $scope.departureAirportName = '';
+        $scope.departureAirport = null;
+        $scope.arrivalAirportName = '';
+        $scope.arrivalAirport = null;
+        $scope.airline = '';
+        $mdToast.show($mdToast.simple().textContent('Could not find flight'));
       }
     })
   }  

@@ -41,6 +41,9 @@ var whereis = {
     flightsim: {}
   },
   icons: {
+    plain: {
+      url: 'img/marker.svg'
+    },
     plane: {
       path: 'M 10.945622,2.481385 1.36797,-4.666594 c 0.0763,-1.097013 0.134112,-3.5471177 0.0946,-4.0021647 -0.331214,-3.8145713 -2.757313,-2.1834763 -2.787766,-0.48187 -0.0083,0.465402 -0.103486,2.8723787 -0.119007,4.4796237 L -10.96409,2.553154 -11,4.828486 -1.186748,0.42526 -0.866214,7.502771 -3.715272,9.511007 -3.740362,11 0.010472,9.995567 l 5.5e-4,0.0123 3.780595,0.979879 L 3.753497,9.499762 0.886917,7.512396 1.151698,0.432288 11,4.752978 Z',
       fillColor: 'white',
@@ -118,7 +121,7 @@ function initialize() {
     }
 
     if (whereis.tracking.mode == whereis.mode.TRACKING) {
-      setMyPosition(latlng, whereis.icons.harley);
+      setMyPosition(latlng, whereis.icons.plain);
       if (positions.length >= 2) {
         var trackingPathCoordinates = positions.slice(-20).map(function(position) { return { lat: position.lat, lng: position.lon }});
         if(!trackingPath) {
@@ -165,7 +168,7 @@ function setMapFollow(follow) {
 }
 
 function setLocationData(locationdata) {
-  var parts = locationdata.filter(function(item) { return (item !== undefined); })
+  var parts = locationdata.filter(function(item) { return (item !== undefined && item !== null); })
   var html = '<h1>' + parts.shift() + '</h1>';
   if(parts.length > 0) {
     html = html + '<span class="sub">' + parts.join(', ') + '</span>';
@@ -193,9 +196,11 @@ function showPoweredBy() {
     small_credits = whereis.poweredby.tracking._;  
   } else if (whereis.tracking.mode === whereis.mode.FLIGHT) {
     small_credits = whereis.poweredby.flight._;
-    var airlinecode = whereis.tracking.flightsim.flightdata.airline.code.toLowerCase();
-    if (whereis.poweredby.flight[airlinecode]) {
-      small_credits = whereis.poweredby.flight[airlinecode];
+    if (whereis.tracking.flightsim.flightdata.airline.code) {
+      var airlinecode = whereis.tracking.flightsim.flightdata.airline.code.toLowerCase();
+      if (whereis.poweredby.flight[airlinecode]) {
+        small_credits = whereis.poweredby.flight[airlinecode];
+      }
     }
   }
 
