@@ -57,11 +57,11 @@ whereis.icons =
   },
   plane: {
     path: 'M 10.945622,2.481385 1.36797,-4.666594 c 0.0763,-1.097013 0.134112,-3.5471177 0.0946,-4.0021647 -0.331214,-3.8145713 -2.757313,-2.1834763 -2.787766,-0.48187 -0.0083,0.465402 -0.103486,2.8723787 -0.119007,4.4796237 L -10.96409,2.553154 -11,4.828486 -1.186748,0.42526 -0.866214,7.502771 -3.715272,9.511007 -3.740362,11 0.010472,9.995567 l 5.5e-4,0.0123 3.780595,0.979879 L 3.753497,9.499762 0.886917,7.512396 1.151698,0.432288 11,4.752978 Z',
-    fillColor: 'white',
+    fillColor: 'red',
     fillOpacity: 1,
     scale: 1,
-    strokeColor: 'black',
-    strokeWeight: 0.5,
+    strokeColor: 'red',
+    strokeWeight: 0,
     rotation: 45
   },
   harley: {
@@ -132,7 +132,8 @@ function initialize() {
     }
 
     if (whereis.tracking.mode == whereis.mode.TRACKING) {
-      if (!track.gps.accuracy || track.gps.accuracy < 20)
+      var accuracy = track.gps != undefined && track.gps.accuracy != undefined ? track.gps.accuracy : 5;
+      if (accuracy < 20)
         setMyPosition(latlng, whereis.icons.plain);
       else 
         setInaccuratePosition(latlng, track.gps.accuracy);
@@ -158,10 +159,8 @@ function initialize() {
 }
 
 function setInaccuratePosition(latlng, accuracy) {
-  if (whereis.me.marker !== undefined) 
-    whereis.me.marker.setMap(null);
-
-  console.log(whereis.me.inaccuratemarker);
+  if (whereis.me.marker !== undefined) whereis.me.marker.setMap(null);
+  if (trackingPath !== undefined) trackingPath.setMap(null);
 
   if (!whereis.me.inaccuratemarker) {
     whereis.me.inaccuratemarker = new google.maps.Circle({

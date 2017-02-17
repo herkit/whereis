@@ -93,6 +93,9 @@ whereis.mapstyle = [
     "stylers": [
       {
         "color": "#a5b076"
+      },
+      {
+        "visibility": "off"
       }
     ]
   },
@@ -117,14 +120,6 @@ whereis.mapstyle = [
   {
     "featureType": "road",
     "elementType": "labels.icon",
-    "stylers": [
-      {
-        "visibility": "off"
-      }
-    ]
-  },
-  {
-    "featureType": "road.arterial",
     "stylers": [
       {
         "visibility": "off"
@@ -243,15 +238,6 @@ whereis.mapstyle = [
     "stylers": [
       {
         "color": "#dfd2ae"
-      }
-    ]
-  },
-  {
-    "featureType": "water",
-    "elementType": "geometry.fill",
-    "stylers": [
-      {
-        "color": "#b9d3c2"
       }
     ]
   },

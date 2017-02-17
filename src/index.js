@@ -14,6 +14,7 @@ var log = require('./lib/log'),
     db = require('./server/db'),
     model = require('./server/model'),
     events = require('./events'),
+    statemanager = require('./statemanager'),
     LatLon = require('./static/app/geo');
 
 Date.getUtcTimestamp = function() {
@@ -133,7 +134,9 @@ then(() =>
     });
 
     // incoming data, i.e. update a map
+    var trackTimeout;
     tracker.on ('track', function (track) {
+      if (trackTimeout) clearTimeout(trackTimeout);
       log.info('Tracker data: %s', track.raw);
       log.debug("Position received: " + track.geo.latitude + ", " + track.geo.longitude);
       db('gpslog').
@@ -158,6 +161,7 @@ then(() =>
           if (current.state === 'track') {
             current.data = track;
             emitCurrent();
+            trackTimeout = setTimeout(emitCurrent, 120000);
           }
         })  
       });
