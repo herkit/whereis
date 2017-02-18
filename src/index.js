@@ -27,103 +27,7 @@ db.
 init().
 then(() => 
   {
-    var history = [];
-    var upcomingFlights = [];
-
-    var current = {
-      state: 'track',
-      data: {}
-    };
-
-    events.on('command:stoptracking', function() {
-      current.state = "stopped";
-    });
-    events.on('command:starttracking', function() {
-      current.state = "track";
-      current.data = history.slice(-1).pop();
-    })
-    events.on('command:startflight', function(data) {
-      db('flights').
-      select('*').
-      where('id', data.id).
-      then((records) => {
-        var flightData = model.restructure(records[0]);
-        var flightTime = flightData.to.timestamp - flightData.from.timestamp;
-        flightData.from.timestamp = Date.getUtcTimestamp();
-        flightData.to.timestamp = flightData.from.timestamp + flightTime;
-
-        log.debug('command:startflight', flightData);
-        setCurrentFlight(flightData);
-      })
-    })
-
-    function setCurrentFlight(flight) {
-      log.debug('Entering flightmode', flight.from.code, flight.to.code);
-      current.state = 'flight';
-      current.data = flight;
-      current.stateTimeout = setTimeout(function() {
-        var toLoc = current.data.to.location;
-        log.debug('Exiting flightmode');
-        current.state = 'track';
-        current.data = { geo: { lat: toLoc.latitude, lng: toLoc.longitude }, address: { address: current.data.to.name } };
-        emitCurrent();
-      }, (flight.to.timestamp - Date.getUtcTimestamp()) * 1000);      
-      emitCurrent();
-    }
-
-    var now = Date.getUtcTimestamp();
-    log.debug('find flights active after', now);
-    Promise.all([
-      db.getGpsLog(20),
-      db.getUpcomingFlights()
-    ]).
-    spread((gpslog, flights) => {
-      history = gpslog;
-      upcomingFlights = flights;
-
-      log.debug(flights.map((f) => { return f.from.timestamp; }));
-      
-      log.debug("data loaded");
-      var lasttrack = history.slice(-1).pop();
-      current.state = 'track';
-      current.data = lasttrack;
-
-      if (upcomingFlights.length > 0) {
-        var firstFlight = upcomingFlights.slice(0,1)[0];
-        log.debug('preflight check');
-        var now = Date.getUtcTimestamp();
-        if (firstFlight.from.timestamp < now && firstFlight.to.timestamp > now) {
-          setCurrentFlight(firstFlight);
-        } else {
-          emitCurrent();
-        }
-      }
-    })
-
-    function emitCurrent()
-    { 
-      var dataToSend = current.data;
-      if (current.state === 'track') {
-        var tracktime = new Date(current.data.datetime);
-        debug("is stale:", tracktime.getTime(), Date.now());
-        var age = Date.now() - tracktime.getTime();
-        if (age > 120000) {
-          var currentLatLon = new LatLon(current.data.geo.latitude, current.data.geo.longitude);
-          var bearing = getRandomInt(0, 360);
-          var addDistance = getRandomInt(100, 500);
-          debug("adding ", addDistance, "m on bearing", bearing);
-          var maskedLatLon = currentLatLon.destinationPoint(addDistance, bearing);
-          dataToSend = { geo: { latitude: maskedLatLon.lat, longitude: maskedLatLon.lon }, gps: { accuracy: 1000 + Math.min(age/2000, 1000)}, address: current.data.address };
-        }
-      }
-
-      io.emit(current.state, dataToSend);
-    }
-
-
-    io.on('connection', function(socket) {
-      emitCurrent();
-    })
+    statemanager.init();
 
     tracker.createServer ({
       protocols: {
@@ -157,12 +61,7 @@ then(() =>
               });
             });
           }
-          history.push(track);
-          if (current.state === 'track') {
-            current.data = track;
-            emitCurrent();
-            trackTimeout = setTimeout(emitCurrent, 120000);
-          }
+          events.emit('track', track);
         })  
       });
     });
@@ -188,22 +87,6 @@ then(() =>
       if (err)
         log.error(err);
     })
-
-    function prefix_names(table, prefix, fields)
-    {
-        if (fields instanceof Array) {
-            return fields.map(field_name => table + '.' + field_name+' as '+prefix + field_name);
-        }
-        else {
-            return Array.prototype.slice.call(arguments).map(field_name => table + '.' + field_name+' as '+prefix + field_name);
-        }
-    }
-
-    function getRandomInt(min, max) {
-      min = Math.ceil(min);
-      max = Math.floor(max);
-      return Math.floor(Math.random() * (max - min)) + min;
-    }
   }
 )
 

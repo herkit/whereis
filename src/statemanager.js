@@ -2,12 +2,16 @@ var
   events = require('./events'),
   log = require('./lib/log'),
   debug = require('debug')('whereis:statemanager'),
-  io = require('./server/client-io');
+  Promise = require('bluebird'),
+  db = require('./server/db'),
+  io = require('./server/client-io'),
+  LatLon = require('./static/app/geo');
 
 var state = { };
 
 var history = [];
 var upcomingFlights = [];
+var trackTimeout;
 
 var current = {
   state: 'track',
@@ -45,8 +49,43 @@ function init() {
     });
   })
   events.on('track', function(track) {
-
+    if (current.state === 'track') {
+      history.push(track);
+      current.data = track;
+      emitCurrent();
+      if (trackTimeout) clearTimeout(trackTimeout);
+      trackTimeout = setTimeout(emitCurrent, 120000);
+    }
   });
+
+  var now = Date.getUtcTimestamp();
+  log.debug('find flights active after', now);
+  Promise.all([
+    db.getGpsLog(20),
+    db.getUpcomingFlights()
+  ]).
+  spread((gpslog, flights) => {
+    history = gpslog;
+    upcomingFlights = flights;
+
+    log.debug(flights.map((f) => { return f.from.timestamp; }));
+    
+    log.debug("data loaded");
+    var lasttrack = history.slice(-1).pop();
+    current.state = 'track';
+    current.data = lasttrack;
+
+    if (upcomingFlights.length > 0) {
+      var firstFlight = upcomingFlights.slice(0,1)[0];
+      log.debug('preflight check');
+      var now = Date.getUtcTimestamp();
+      if (firstFlight.from.timestamp < now && firstFlight.to.timestamp > now) {
+        setCurrentFlight(firstFlight);
+      } else {
+        emitCurrent();
+      }
+    }
+  })
 
   function setCurrentFlight(flight) {
     log.debug('Entering flightmode', flight.from.code, flight.to.code);
@@ -54,9 +93,9 @@ function init() {
     current.data = flight;
     current.stateTimeout = setTimeout(function() {
       var toLoc = current.data.to.location;
-      log.debug('Exiting flightmode');
+      log.debug('Exiting flightmode, setting location to', toLoc);
       current.state = 'track';
-      current.data = { datetime: new Date(current.data.to.timestamp * 1000).toISOString(), geo: { lat: toLoc.latitude, lng: toLoc.longitude }, gps: { accuracy: 100 }, address: { address: current.data.to.name } };
+      current.data = { datetime: new Date(current.data.to.timestamp * 1000).toISOString(), geo: { latitude: toLoc.lat, longitude: toLoc.lng }, gps: { accuracy: 500 }, address: { address: current.data.to.name } };
       emitCurrent();
     }, (flight.to.timestamp - Date.getUtcTimestamp()) * 1000);      
     emitCurrent();
@@ -85,6 +124,12 @@ function init() {
   io.on('connection', function(socket) {
     emitCurrent();
   })
+}
+
+function getRandomInt(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min)) + min;
 }
 
 module.exports.init = init;
