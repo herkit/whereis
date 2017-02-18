@@ -143,7 +143,7 @@ function initialize() {
           trackingPath = new google.maps.Polyline({
             path: trackingPathCoordinates,
             geodesic: true,
-            strokeColor: '#0000FF',
+            strokeColor: '#FF0000',
             strokeOpacity: 0.75,
             strokeWeight: 4
           });
@@ -164,10 +164,10 @@ function setInaccuratePosition(latlng, accuracy) {
 
   if (!whereis.me.inaccuratemarker) {
     whereis.me.inaccuratemarker = new google.maps.Circle({
-      strokeColor: '#0066FF',
+      strokeColor: '#FF6600',
       strokeOpacity: 0.8,
       strokeWeight: 2,
-      fillColor: '#0066FF',
+      fillColor: '#FF6600',
       fillOpacity: 0.35,
       center: latlng,
       map: whereis.map,

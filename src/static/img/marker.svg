@@ -20,6 +20,17 @@
   <defs
      id="defs6136">
     <linearGradient
+       id="linearGradient4507">
+      <stop
+         id="stop4503"
+         offset="0"
+         style="stop-color:#ff0000;stop-opacity:1" />
+      <stop
+         id="stop4505"
+         offset="1"
+         style="stop-color:#ff967a;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient
        id="linearGradient6680">
       <stop
          style="stop-color:#0066ff;stop-opacity:1;"
@@ -52,13 +63,14 @@
        gradientUnits="userSpaceOnUse" />
     <linearGradient
        inkscape:collect="always"
-       xlink:href="#linearGradient6680"
+       xlink:href="#linearGradient4507"
        id="linearGradient6700"
        gradientUnits="userSpaceOnUse"
-       x1="3.293148"
-       y1="10.698918"
-       x2="18.67767"
-       y2="10.698918" />
+       x1="7.340415"
+       y1="14.838169"
+       x2="14.814368"
+       y2="6.6516509"
+       gradientTransform="matrix(0.91000556,0,0,0.91000555,-9.996783,1042.6261)" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -67,17 +79,17 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="11.2"
-     inkscape:cx="14.151001"
-     inkscape:cy="8.9659511"
+     inkscape:zoom="15.839192"
+     inkscape:cx="50.716266"
+     inkscape:cy="-12.984501"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1331"
-     inkscape:window-height="814"
-     inkscape:window-x="446"
-     inkscape:window-y="328"
-     inkscape:window-maximized="0"
+     inkscape:window-width="2560"
+     inkscape:window-height="1377"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
      fit-margin-top="0"
      viewbox-y="11" />
   <metadata
@@ -97,23 +109,17 @@
      inkscape:groupmode="layer"
      id="layer1"
      transform="translate(0,-1030.3622)">
-    <g
-       id="g6696"
-       transform="translate(-11,10.999977)">
-      <circle
-         transform="matrix(1.0656337,0,0,1.0656337,-0.26911272,1029.7929)"
-         id="path6144"
-         style="opacity:0.41592922;fill:#0066ff;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         cx="10.575034"
-         cy="10.856754"
-         r="10.322496" />
-      <circle
-         transform="matrix(0.91000556,0,0,0.91000555,1.003217,1031.6261)"
-         id="path6142"
-         style="fill:url(#linearGradient6700);fill-opacity:1;fill-rule:nonzero;stroke:#e3f3f8;stroke-width:2;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
-         cx="10.985409"
-         cy="10.698918"
-         r="6.6922607" />
-    </g>
+    <circle
+       r="11"
+       cy="1052.3622"
+       cx="-2.4012385e-007"
+       style="opacity:0.32999998;fill:#ff0000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1.06563365"
+       id="path6144" />
+    <circle
+       r="6.0899944"
+       cy="1052.3622"
+       cx="7.1365506e-008"
+       style="fill:url(#linearGradient6700);fill-opacity:1;fill-rule:nonzero;stroke:#e3f3f8;stroke-width:1.81968746;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path6142" />
   </g>
 </svg>
