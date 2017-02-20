@@ -210,6 +210,7 @@ angular
         controller: AddFlightDialogController,
         templateUrl: '/app/dialogs/addflight/addflight.html',
         parent: angular.element(document.body),
+        fullscreen: true,
         clickOutsideToClose:true
       })
       .then(
