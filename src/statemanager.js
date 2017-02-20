@@ -57,6 +57,9 @@ function init() {
       trackTimeout = setTimeout(emitCurrent, 120000);
     }
   });
+  events.on('viewer:joined', function(data) {
+    debug('Viewer added', data);
+  })
 
   var now = Date.getUtcTimestamp();
   log.debug('find flights active after', now);
@@ -104,6 +107,7 @@ function init() {
   function emitCurrent()
   {
     var dataToSend = current.data;
+    debug(current);
     if (current.state === 'track') {
       var tracktime = new Date(current.data.datetime);
       debug("is stale:", tracktime.getTime(), Date.now());
@@ -118,10 +122,11 @@ function init() {
       }
     }
 
-    io.emit(current.state, current.data);
+    io.emit(current.state, dataToSend);
   }
 
   io.on('connection', function(socket) {
+    debug("socket io connection session id", socket)
     emitCurrent();
   })
 }

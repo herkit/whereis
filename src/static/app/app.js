@@ -114,6 +114,7 @@ function initialize() {
   socket = io.connect();
 
   socket.on('track', function(track) {
+    console.log(track);
     var latlng = { lat: track.geo.latitude, lng: track.geo.longitude };
     var latlon = new LatLon(track.geo.latitude, track.geo.longitude);
 
@@ -127,6 +128,10 @@ function initialize() {
         track.address.state_long || track.address.state, 
         track.address.country_long || track.address.country
       ];
+
+      if (track.speed)
+        if (track.speed.kmh) parts.push(track.speed.kmh.toFixed(1) + 'km/h');
+
 
       setLocationData(parts);
     }
@@ -164,10 +169,10 @@ function setInaccuratePosition(latlng, accuracy) {
 
   if (!whereis.me.inaccuratemarker) {
     whereis.me.inaccuratemarker = new google.maps.Circle({
-      strokeColor: '#FF6600',
+      strokeColor: '#FF0000',
       strokeOpacity: 0.8,
       strokeWeight: 2,
-      fillColor: '#FF6600',
+      fillColor: '#FF0000',
       fillOpacity: 0.35,
       center: latlng,
       map: whereis.map,
