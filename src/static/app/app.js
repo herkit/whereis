@@ -221,7 +221,7 @@ function setLocationData(locationdata) {
   var parts = locationdata.filter(function(item) { return (item !== undefined && item !== null); })
   var html = '<h1>' + parts.shift() + '</h1>';
   if(parts.length > 0) {
-    html = html + '<span class="sub">' + parts.join(', ') + '</span>';
+    html = html + parts.map(function(part) { return '<span class="sub">' + part + '</span>'; }).join("");
   }
   locationDiv.innerHTML = html;
 }

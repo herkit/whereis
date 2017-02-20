@@ -33,6 +33,7 @@ function init() {
     then((records) => {
       var flightData = model.restructure(records[0]);
       var flightTime = flightData.to.timestamp - flightData.from.timestamp;
+      flightData.flightnumber = flightData.flightnumber.toUpperCase();
       flightData.from.timestamp = Date.getUtcTimestamp();
       flightData.to.timestamp = flightData.from.timestamp + flightTime;
 
@@ -69,7 +70,7 @@ function init() {
   ]).
   spread((gpslog, flights) => {
     history = gpslog;
-    upcomingFlights = flights;
+    upcomingFlights = flights.map(function(flight) { flight.flightnumber = flight.flightnumber.toUpperCase(); return flight; });
 
     log.debug(flights.map((f) => { return f.from.timestamp; }));
     

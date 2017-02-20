@@ -1,0 +1,75 @@
+html,body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+#whereis-mapCanvas {
+
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+#wrapper {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  position: relative;
+}
+
+div#poweredby {
+  padding: 0px;
+  z-index: 1000;
+  position: absolute;
+  right: 5px;
+  top: 5px;
+  cursor: pointer;
+  max-width:380px;
+  font-family: Product Sans, Relish, Helvetica, Arial, sans-serif; 
+}
+
+div#currentLocation {
+  margin: 10px;
+}
+
+div#currentLocation h1 {
+  font-family: 'Russo One', sans-serif;
+  font-size: 40px;
+  margin: 0px;
+}
+div#currentLocation .sub {
+  font-family: 'Open Sans';
+  font-size: 20px;
+}
+
+@media screen and (min-width: 811px) {
+  #currentLocation {
+    position: absolute;
+    width: 20%;
+    min-width: 250px;
+    margin: 0px !important;
+    padding: 10px;
+    top: 0px;
+    left: 0px;
+    background-color: #FFF;
+    box-shadow: 4px 4px 7px rgba(102, 102, 102, 0.5);
+  }
+
+  .sub {
+    display: block;
+  }
+}
+
+@media all and (max-width: 810px) {
+  .sub + .sub::before {
+    content: ", ";
+  }
+
+  #wrapper { height: 85%; }
+  #currentLocation { 
+    position: relative; 
+    top: 0; 
+    left: 0;
+  }
+}

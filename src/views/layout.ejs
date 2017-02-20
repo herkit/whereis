@@ -1,59 +1,16 @@
 <!DOCTYPE html>
 <head>
-<meta name="viewport"></meta>
+<% if (locals.isFacebook) { %>
+<meta name="viewport" content="width=810px, initial-scale=1.0"></meta>
+<% } else { %>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
+<% } %>
+
 <title>Where is The Great Escape?</title>
 <link href="https://fonts.googleapis.com/css?family=Francois+One|Open+Sans" rel="stylesheet">
-<style type="text/css">
-html,body {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-}
-#whereis-mapCanvas {
-
-  height: 100%;
-  width: 100%;
-  margin: 0;
-  padding: 0;
-}
-#wrapper {
-  height: 100%;
-  width: 100%;
-  margin: 0;
-  padding: 0;
-  position: relative;
-}
-
-div#poweredby {
-  padding: 0px;
-  z-index: 1000;
-  position: absolute;
-  right: 5px;
-  top: 5px;
-  cursor: pointer;
-  max-width:380px;
-  font-family: Product Sans, Relish, Helvetica, Arial, sans-serif; 
-}
-
-div#currentLocation {
-  margin: 10px;
-}
-
-div#currentLocation h1 {
-  font-family: 'Russo One', sans-serif;
-  font-size: 40px;
-  margin: 0px;
-}
-div#currentLocation .sub {
-  font-family: 'Open Sans';
-  font-size: 20px;
-}
-
-</style>
+<link href="css/core.css" rel="stylesheet">
 <% if (locals.isFacebook) { %>
 <link href="css/facebook.css" rel="stylesheet" />
 <% } %>
-
-
 <%- body %>
 </html>
