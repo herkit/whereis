@@ -88,6 +88,7 @@ var onflight = false;
 var trackingPath;
 var positions = [];
 var locationDiv;
+var setMapFollowButton;
 var socket;
 
 function initialize() {
@@ -109,7 +110,11 @@ function initialize() {
     styles: whereis.mapstyle
   });
 
+  whereis.map.addListener('dragend', mapManuallyChanged);
+  whereis.map.addListener('click', mapManuallyChanged);
+
   locationDiv = document.getElementById('currentLocation');
+  setMapFollowButton = document.getElementById('setMapFollowButton');
 
   socket = io.connect();
 
@@ -187,6 +192,10 @@ function setInaccuratePosition(latlng, accuracy) {
     whereis.map.setCenter(latlng);
 }
 
+function mapManuallyChanged() {
+  setMapFollow(false);
+}
+
 function setMyPosition(latlng, icon) {
   if (whereis.me.inaccuratemarker && whereis.me.inaccuratemarker.map)
   {
@@ -214,7 +223,17 @@ function setMyPosition(latlng, icon) {
 function setMapFollow(follow) {
   whereis.tracking.mapFollow = follow;
   if (follow)
-    whereis.map.setCenter(whereis.me.marker.position);
+  {
+    if (whereis.me.marker)
+      whereis.map.setCenter(whereis.me.marker.position);
+    else if (whereis.me.inaccuratemarker)
+      whereis.map.setCenter(whereis.me.inaccuratemarker.center);
+    setMapFollowButton.style.display = "none";
+  } 
+  else 
+  {
+    setMapFollowButton.style.display = "inline";
+  }
 }
 
 function setLocationData(locationdata) {

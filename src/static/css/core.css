@@ -29,22 +29,22 @@ div#poweredby {
   font-family: Product Sans, Relish, Helvetica, Arial, sans-serif; 
 }
 
-div#currentLocation {
+#quickInfo {
   margin: 10px;
 }
 
-div#currentLocation h1 {
+#currentLocation h1 {
   font-family: 'Russo One', sans-serif;
   font-size: 40px;
   margin: 0px;
 }
-div#currentLocation .sub {
+#currentLocation .sub {
   font-family: 'Open Sans';
   font-size: 20px;
 }
 
 @media screen and (min-width: 811px) {
-  #currentLocation {
+  #quickInfo {
     position: absolute;
     width: 20%;
     min-width: 250px;
@@ -67,7 +67,7 @@ div#currentLocation .sub {
   }
 
   #wrapper { height: 85%; }
-  #currentLocation { 
+  #quickInfo { 
     position: relative; 
     top: 0; 
     left: 0;
