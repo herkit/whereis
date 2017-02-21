@@ -12,8 +12,24 @@
   </div>
 </md-toolbar>
 
-<div layout="column" layout-gt-sm="row" flex  ng-controller="FlightsCtrl">
-  <div ng-cloak flex-gt-sm="50" flex-gt-xl="33" class="md-padding">
+<div layout="column" layout-gt-sm="row" flex>
+  <div ng-cloak flex-gt-sm="25" flex-gt-xl="33" class="md-padding" ng-controller="SettingsCtrl">
+    <h3>Tracking status</h3>
+    <md-list>
+      <md-list-item>
+        <p>Privacy mode</p>
+        <md-switch ng-model="privacymode"></md-switch>
+      </md-list-item>
+      <md-subheader class="md-no-sticky">Devices</md-subheader>
+      <md-list-item ng-repeat="device in devices">
+        <p flex="70">{{device.description}}</p>
+        <p flex><span am-time-ago="device.lasttrack"></span></p>
+        <md-switch ng-model="device.active" class="md-primary"></md-switch>        
+      </md-list-item>
+    </md-list>
+  </div>
+
+  <div ng-cloak flex-gt-sm="50" flex-gt-xl="33" class="md-padding" ng-controller="FlightsCtrl">
     <h3>Upcoming flights</h3>
 
     <md-list>

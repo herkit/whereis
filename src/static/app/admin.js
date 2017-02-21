@@ -142,6 +142,32 @@ angular
 
 angular
 .module('WhereisAdminApp')
+.controller('SettingsCtrl', 
+  function($scope, $mdToast, adminApi) {
+    var ctrl = this;
+    $scope.privacymode = false;
+    $scope.devices = [
+      {
+        id: '087073819397',
+        description: 'GPS tracker',
+        poweredby: 'whereversim',
+        lasttrack: moment(),
+        active: true
+      },
+      {
+        id: '738689',
+        description: 'Xperia Z',
+        poweredby: 'android',
+        lasttrack: moment(),
+        active: true
+      }
+    ]
+  }
+);
+
+
+angular
+.module('WhereisAdminApp')
 .controller('FlightsCtrl',
   function($scope, $mdToast, $mdDialog, adminApi) {
     var ctrl = this;
