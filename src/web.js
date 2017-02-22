@@ -9,7 +9,7 @@ module.exports = function(app) {
 
   app.post('/', function(req, res) {
     if (req.body.signed_request) {
-      events.emit('viewer:joined', { facebook: req.body.signed_request, session: req.sessionID });
+      events.emit('viewer:joined', { facebook: JSON.parse(req.body.signed_request), session: req.sessionID });
     }
     res.render('pages/index', { googleapikey: process.env.GOOGLE_MAPS_CLIENT_KEY, isFacebook: true });
   });

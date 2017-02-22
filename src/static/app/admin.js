@@ -165,6 +165,17 @@ angular
   }
 );
 
+angular
+.module('WhereisAdminApp')
+.controller('ViewersCtrl',
+  function($scope, adminWss) {
+    var ctrl = this;
+    $scope.viewers = [ { user_id: 1234, name: "some viewer" } ];
+    adminWss.on('viewer:joined', function(eventdata) {
+      $scope.viewers.push(eventdata.facebook);
+    })
+  }
+);
 
 angular
 .module('WhereisAdminApp')
@@ -331,6 +342,32 @@ angular
   }
 );
 
+angular.
+  module('WhereisAdminApp').
+  factory('adminWss', function($rootScope) {
+    var socket = io.connect('/admin');
+    return {
+      on: function (eventName, callback) {
+        console.log(eventName);
+        socket.on(eventName, function () {  
+          var args = arguments;
+          $rootScope.$apply(function () {
+            callback.apply(socket, args);
+          });
+        });
+      },
+      emit: function (eventName, data, callback) {
+        socket.emit(eventName, data, function () {
+          var args = arguments;
+          $rootScope.$apply(function () {
+            if (callback) {
+              callback.apply(socket, args);
+            }
+          });
+        })
+      }
+    };
+  });
 
 function LoginDialogController($scope, $mdDialog) {
 

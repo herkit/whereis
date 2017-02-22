@@ -4,6 +4,7 @@ var cache = require('./lib/geoloccache'),
     passport = require('./auth'), 
     moment = require('moment'),
     Promise = require('bluebird'),
+    io = require('./server/client-io'),
     db = require('./server/db'),
     model = require('./server/model'),
     events = require('./events'),
@@ -25,6 +26,11 @@ var isAuthenticated = function (req, res, next) {
     return next();
   res.status(401).send({ error: "You are not authorized" });
 }
+
+events.on('viewer:joined', function(user) {
+  debug('viewer:joined');
+  io.admin.emit('viewer:joined', user);
+})
 
 module.exports = function(app) {
   app.get('/api/geocode/cache/all',
