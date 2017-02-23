@@ -118,6 +118,21 @@ function initialize() {
 
   socket = io.connect();
 
+  socket.on('connect', function() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        function(loc) { 
+          socket.emit('iam', { user_id: "-anonymous-", location: { lat: loc.coords.latitude, lng: loc.coords.longitude }});
+        }, 
+        function() {
+          socket.emit('iam', { user_id: "-anonymous-" });
+        }
+      );
+    } else {
+      socket.emit('iam', { user_id: "-anonymous-" });      
+    }
+  });
+
   socket.on('track', function(track) {
     console.log(track);
     var latlng = { lat: track.geo.latitude, lng: track.geo.longitude };

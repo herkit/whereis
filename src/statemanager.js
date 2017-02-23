@@ -56,14 +56,11 @@ function init() {
     if (current.state === 'track') {
       history.push(track);
       current.data = track;
-      emitCurrent();
+      emitCurrent(io);
       if (trackTimeout) clearTimeout(trackTimeout);
-      trackTimeout = setTimeout(emitCurrent, 120000);
+      trackTimeout = setTimeout(emitCurrent, 120000, io);
     }
   });
-  events.on('viewer:joined', function(data) {
-    debug('Viewer added', data);
-  })
 
   var now = Date.getUtcTimestamp();
   log.debug('find flights active after', now);
@@ -93,7 +90,7 @@ function init() {
       if (firstFlight.from.timestamp < now && firstFlight.to.timestamp > now) {
         setCurrentFlight(firstFlight);
       } else {
-        emitCurrent();
+        emitCurrent(io);
       }
     }
   })
@@ -107,12 +104,12 @@ function init() {
       log.debug('Exiting flightmode, setting location to', toLoc);
       current.state = 'track';
       current.data = { datetime: new Date(current.data.to.timestamp * 1000).toISOString(), geo: { latitude: toLoc.lat, longitude: toLoc.lng }, gps: { accuracy: 500 }, address: { address: current.data.to.name } };
-      emitCurrent();
+      emitCurrent(io);
     }, (flight.to.timestamp - Date.getUtcTimestamp()) * 1000);      
-    emitCurrent();
+    emitCurrent(io);
   }
 
-  function emitCurrent()
+  function emitCurrent(socket)
   {
     var dataToSend = current.data;
     debug(current);
@@ -130,12 +127,15 @@ function init() {
       }
     }
 
-    io.emit(current.state, dataToSend);
+    socket.emit(current.state, dataToSend);
   }
 
   io.on('connection', function(socket) {
-    debug("socket io connection session id", socket)
-    emitCurrent();
+    debug("socket io connection session request", socket.request)
+    socket.on('iam', function(me) {
+      events.emit('viewer:joined', me);
+      emitCurrent(socket);
+    })
   })
 }
 
