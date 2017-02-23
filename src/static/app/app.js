@@ -88,7 +88,7 @@ var onflight = false;
 var trackingPath;
 var positions = [];
 var locationDiv;
-var setMapFollowButton;
+var setMapFollowControlDiv;
 var socket;
 
 function initialize() {
@@ -105,16 +105,25 @@ function initialize() {
   window.whereis.map = new google.maps.Map(mapDiv, {
     center: new google.maps.LatLng(28.538336, -81.379234),
     zoom: 12,
-    mapTypeControl: false,
-    streetViewControl: false,
+    mapTypeControl: true,
+    mapTypeControlOptions: {
+      style: google.maps.MapTypeControlStyle.DEFAULT,
+      position: google.maps.ControlPosition.TOP_CENTER,
+      mapTypeIds: ['roadmap', 'satellite']
+    },
     styles: whereis.mapstyle
   });
 
   whereis.map.addListener('dragend', mapManuallyChanged);
   whereis.map.addListener('click', mapManuallyChanged);
 
+  setMapFollowControlDiv = document.createElement('div');
+  var setMapFollowControl = new SetMapFollowControl(setMapFollowControlDiv, whereis.map);
+
+  setMapFollowControlDiv.index = 1;
+  whereis.map.controls[google.maps.ControlPosition.TOP_CENTER].push(setMapFollowControlDiv);  
+
   locationDiv = document.getElementById('currentLocation');
-  setMapFollowButton = document.getElementById('setMapFollowButton');
 
   socket = io.connect();
 
@@ -243,11 +252,11 @@ function setMapFollow(follow) {
       whereis.map.setCenter(whereis.me.marker.position);
     else if (whereis.me.inaccuratemarker)
       whereis.map.setCenter(whereis.me.inaccuratemarker.center);
-    setMapFollowButton.style.display = "none";
+    setMapFollowControlDiv.style.visibility = "hidden";
   } 
   else 
   {
-    setMapFollowButton.style.display = "inline";
+    setMapFollowControlDiv.style.visibility = "visible";
   }
 }
 
@@ -290,4 +299,29 @@ function showPoweredBy() {
 
   credits.innerHTML = small_credits;
   credits.style.fontSize = '1em';
+}
+
+function SetMapFollowControl(controlDiv, map) {
+  var controlUI = document.createElement('div');
+  controlUI.style.backgroundColor = '#fff';
+  controlUI.style.border = '2px solid #fff';
+  controlUI.style.borderRadius = '3px';
+  controlUI.style.boxShadow = 'rgba(0, 0, 0, 0.298039) 0px 1px 4px -1px';
+  controlUI.style.cursor = 'pointer';
+  controlUI.style.marginTop = '10px';
+  controlUI.style.marginBottom = '5px';
+  controlUI.style.textAlign = 'center';
+  controlUI.title = 'Click to recenter the map';
+  controlDiv.appendChild(controlUI);
+
+  var controlText = document.createElement('div');
+  controlText.style.color = 'rgb(25,25,25)';
+  controlText.style.paddingLeft = '5px';
+  controlText.style.paddingRight = '5px';
+  controlText.innerHTML = '<img src="img/ic_gps_fixed_black_24px.svg" style="display: inline; height: 22px">';
+  controlUI.appendChild(controlText);
+
+  controlUI.addEventListener('click', function() {
+    setMapFollow(true);
+  });
 }
