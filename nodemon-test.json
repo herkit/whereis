@@ -1,0 +1,15 @@
+{
+  "verbose": true,
+  "ignore": [
+    "node_modules/**",
+    "migrations/**", 
+    "src/static/**",
+    "src/views/**",
+    "data/**"
+  ],  
+  "watch": [
+    "src/**/*",
+    "test/specs/**/*"
+  ],
+  "exec": "npm test"
+}

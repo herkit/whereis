@@ -1,15 +1,29 @@
 var Parser = function(pattern, input) {
   var p = this;
   p._match = input.match(pattern);
-  p.fullmatch = p._match.shift();
+  if (p._match)
+    p.fullmatch = p._match.shift();
+
+
+  p.matches = function() {
+    return (p._match !== null);
+  }
 
   p.next = function() {
     return p._match.shift();
   }
 
+  p.skip = function() {
+    p._match.shift();
+  }
+
   p.nextInt = function(radix) {
     radix = radix || 10;
-    return parseInt(p.next(), radix);
+    var next = p.next();
+    if (next !== undefined && next.length > 0)
+      return parseInt(next, radix);
+    else
+      return 0;
   }
 
   p.nextFloat = function() {
