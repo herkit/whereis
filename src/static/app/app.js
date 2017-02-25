@@ -88,8 +88,10 @@ var onflight = false;
 var trackingPath;
 var positions = [];
 var locationDiv;
+var quickInfoDiv;
 var setMapFollowControlDiv;
 var socket;
+var panoramaDiv;
 
 function initialize() {
   whereis.tracking.mode = whereis.mode.TRACKING;
@@ -114,16 +116,47 @@ function initialize() {
     styles: whereis.mapstyle
   });
 
+  whereis.me.inaccuratemarker = new google.maps.Circle({
+    strokeColor: '#FF0000',
+    strokeOpacity: 0.8,
+    strokeWeight: 2,
+    fillColor: '#FF0000',
+    fillOpacity: 0.35,
+    radius: 100
+  });
+
+  whereis.me.marker = new google.maps.Marker({ 
+    icon: whereis.icons.plain,
+    animation: google.maps.Animation.DROP
+  });
+
   whereis.map.addListener('dragend', mapManuallyChanged);
   whereis.map.addListener('click', mapManuallyChanged);
+  whereis.map.addListener('zoom_changed', setMapIndicator);
 
   setMapFollowControlDiv = document.createElement('div');
   var setMapFollowControl = new SetMapFollowControl(setMapFollowControlDiv, whereis.map);
+  quickInfoDiv = document.getElementById('quickInfo');
+  locationDiv = document.getElementById('currentLocation');
+
+  panoramaDiv = document.createElement('div');
+  panoramaDiv.style.width = '100%';
+  panoramaDiv.style.height = '200px';
+
+  quickInfoDiv.appendChild(panoramaDiv);
+
+  whereis.panorama = new google.maps.StreetViewPanorama(
+      panoramaDiv, {
+        position: whereis.map.center,
+        pov: {
+          heading: 34,
+          pitch: 10
+        }
+      });
+  whereis.map.setStreetView(whereis.panorama);
 
   setMapFollowControlDiv.index = 1;
   whereis.map.controls[google.maps.ControlPosition.TOP_CENTER].push(setMapFollowControlDiv);  
-
-  locationDiv = document.getElementById('currentLocation');
 
   socket = io.connect();
 
@@ -167,10 +200,12 @@ function initialize() {
 
     if (whereis.tracking.mode == whereis.mode.TRACKING) {
       var accuracy = track.gps != undefined && track.gps.accuracy != undefined ? track.gps.accuracy : 5;
-      if (accuracy < 20)
-        setMyPosition(latlng, whereis.icons.plain);
-      else 
-        setInaccuratePosition(latlng, track.gps.accuracy);
+      whereis.me.position = latlng;
+      whereis.me.bearing = track.gps.bearing || 0;
+      whereis.me.accuracy = track.gps != undefined && track.gps.accuracy != undefined ? track.gps.accuracy : 5;
+
+      setMapIndicator();
+
       if (positions.length >= 2) {
         var trackingPathCoordinates = positions.slice(-20).map(function(position) { return { lat: position.lat, lng: position.lon }});
         if(!trackingPath) {
@@ -193,55 +228,69 @@ function initialize() {
 }
 
 function setInaccuratePosition(latlng, accuracy) {
-  if (whereis.me.marker !== undefined) whereis.me.marker.setMap(null);
-  if (trackingPath !== undefined) trackingPath.setMap(null);
+  if (whereis.map.zoom > 9) {
+    if (whereis.me.marker !== undefined) whereis.me.marker.setMap(null);
+    if (trackingPath !== undefined) trackingPath.setMap(null);
 
-  if (!whereis.me.inaccuratemarker) {
-    whereis.me.inaccuratemarker = new google.maps.Circle({
-      strokeColor: '#FF0000',
-      strokeOpacity: 0.8,
-      strokeWeight: 2,
-      fillColor: '#FF0000',
-      fillOpacity: 0.35,
-      center: latlng,
-      map: whereis.map,
-      radius: accuracy
-    });
+    if (!whereis.me.inaccuratemarker) {
+      whereis.me.inaccuratemarker = new google.maps.Circle({
+        strokeColor: '#FF0000',
+        strokeOpacity: 0.8,
+        strokeWeight: 2,
+        fillColor: '#FF0000',
+        fillOpacity: 0.35,
+        center: latlng,
+        map: whereis.map,
+        radius: accuracy
+      });
+    } else {
+      whereis.me.inaccuratemarker.setCenter(latlng);
+      whereis.me.inaccuratemarker.setRadius(accuracy);
+      whereis.me.inaccuratemarker.setMap(whereis.map);
+    }
+    if (whereis.tracking.mapFollow)
+      whereis.map.setCenter(latlng);
   } else {
-    whereis.me.inaccuratemarker.setCenter(latlng);
-    whereis.me.inaccuratemarker.setRadius(accuracy);
-    whereis.me.inaccuratemarker.setMap(whereis.map);
+    setMyPosition(latlng, whereis.icons.plain);
   }
-  if (whereis.tracking.mapFollow)
-    whereis.map.setCenter(latlng);
 }
 
 function mapManuallyChanged() {
   setMapFollow(false);
 }
 
-function setMyPosition(latlng, icon) {
-  if (whereis.me.inaccuratemarker && whereis.me.inaccuratemarker.map)
-  {
-    whereis.me.inaccuratemarker.setMap(null);
+function setMapIndicator() {
+  if (whereis.me.accuracy > 200 && whereis.map.zoom > 8) {
+    whereis.me.inaccuratemarker.setCenter(whereis.me.position);
+    whereis.me.inaccuratemarker.setRadius(whereis.me.accuracy);
+    
+    if (!whereis.me.inaccuratemarker.map)
+      whereis.me.inaccuratemarker.setMap(whereis.map);
+
+    whereis.me.marker.setMap(null);
+  } else {
+    if (whereis.tracking.mode == whereis.mode.FLIGHT)
+      whereis.me.marker.setIcon(whereis.icons.plane);
+    else
+      whereis.me.marker.setIcon(whereis.icons.plain);
+
+    whereis.me.marker.setPosition(whereis.me.position);
+
+    if (!whereis.me.marker.map) 
+      whereis.me.marker.setMap(whereis.map);
+
+    if (whereis.me.inaccuratemarker.map)
+      whereis.me.inaccuratemarker.setMap(null);
   }
-  if (!whereis.me.marker) {
-    whereis.me.marker = new google.maps.Marker({ 
-      icon: icon,
-      position: latlng, 
-      animation: google.maps.Animation.DROP,
-      map: whereis.map
-    });
-  }
-  if (!whereis.me.marker.map) {
-    whereis.me.marker.setMap(whereis.map)
-  }
-  if (icon && whereis.me.marker.icon !== icon) {
-    whereis.me.marker.setIcon(icon);
-  }
-  whereis.me.marker.setPosition(latlng);
+
   if (whereis.tracking.mapFollow)
-    whereis.map.setCenter(latlng);
+    whereis.map.setCenter(whereis.me.position);  
+}
+
+function setMyPosition(latlng, icon) {
+  if (whereis.panorama) {
+    whereis.panorama.setPosition(latlng);
+  }
 }
 
 function setMapFollow(follow) {

@@ -33,7 +33,8 @@ then(() =>
       protocols: {
         'tk102': 10001,
         'tk102-clone1': 10002,
-        'osmand': 10003
+        'osmand': 10003,
+        'xexun': 10004
       }
     });
 

@@ -113,7 +113,9 @@
       whereis.tracking.flightsim.endLatLon = new LatLon(whereis.tracking.flightsim.flightdata.to.location.lat, whereis.tracking.flightsim.flightdata.to.location.lng);
       whereis.tracking.flightsim.currentLatLon = new LatLon(whereis.tracking.flightsim.flightdata.from.location.lat, whereis.tracking.flightsim.flightdata.from.location.lng);
 
-      setMyPosition(whereis.tracking.flightsim.currentLatLon.toLatLng(), whereis.icons.plane)
+      whereis.me.position = whereis.tracking.flightsim.currentLatLon.toLatLng();
+      whereis.me.accuracy = 1;
+      setMapIndicator();
 
       whereis.tracking.flightsim.interval = setInterval(function() {
         var currentTime = Date.getUtcTime();
@@ -139,13 +141,17 @@
             whereis.tracking.flightsim.currentLatLon.toLatLng()
           ]);
 
-          setMyPosition(whereis.tracking.flightsim.currentLatLon.toLatLng(), whereis.icons.plane);
+          whereis.me.position = whereis.tracking.flightsim.currentLatLon.toLatLng();
+          whereis.me.accuracy = 1;
+
           if (currentTime > whereis.tracking.flightsim.endTime * 1000) {
             whereis.tracking.mode = whereis.mode.TRACKING;
             clearInterval(whereis.tracking.flightsim.interval);
           }
+
+          setMapIndicator();
         }
-      }, 250);
+      }, 500);
     });  
   }
   google.maps.event.addDomListener(window, 'load', initialize);
