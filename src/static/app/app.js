@@ -89,6 +89,7 @@ var trackingPath;
 var positions = [];
 var locationDiv;
 var quickInfoDiv;
+var setMapFollowControl;
 var setMapFollowControlDiv;
 var socket;
 var panoramaDiv;
@@ -137,12 +138,11 @@ function initialize() {
     animation: google.maps.Animation.DROP
   });
 
-  whereis.map.addListener('dragend', mapManuallyChanged);
-  whereis.map.addListener('click', mapManuallyChanged);
+  whereis.map.addListener('center_changed', mapManuallyChanged);
   whereis.map.addListener('zoom_changed', setMapIndicator);
 
   setMapFollowControlDiv = document.createElement('div');
-  var setMapFollowControl = new SetMapFollowControl(setMapFollowControlDiv, whereis.map);
+  setMapFollowControl = new SetMapFollowControl(setMapFollowControlDiv, whereis.map);
   quickInfoDiv = document.getElementById('quickInfo');
   locationDiv = document.getElementById('currentLocation');
 
@@ -163,7 +163,6 @@ function initialize() {
   whereis.map.setStreetView(whereis.panorama);
 
   setMapFollowControlDiv.index = 1;
-  whereis.map.controls[google.maps.ControlPosition.TOP_CENTER].push(setMapFollowControlDiv);  
 
   socket = io.connect();
 
@@ -207,7 +206,7 @@ function initialize() {
 
     if (whereis.tracking.mode == whereis.mode.TRACKING) {
       var accuracy = track.gps != undefined && track.gps.accuracy != undefined ? track.gps.accuracy : 5;
-      whereis.me.position = latlng;
+      whereis.me.position = new google.maps.LatLng(latlng.lat, latlng.lng);
       whereis.me.bearing = track.gps.bearing || 0;
       whereis.me.accuracy = track.gps != undefined && track.gps.accuracy != undefined ? track.gps.accuracy : 5;
       whereis.me.trail = [];
@@ -252,7 +251,8 @@ function setInaccuratePosition(latlng, accuracy) {
 }
 
 function mapManuallyChanged() {
-  setMapFollow(false);
+  if (!whereis.map.getCenter().equals(whereis.me.position))
+    setMapFollow(false);
 }
 
 function setMapIndicator() {
@@ -302,15 +302,16 @@ function setMapFollow(follow) {
   whereis.tracking.mapFollow = follow;
   if (follow)
   {
-    if (whereis.me.marker)
-      whereis.map.setCenter(whereis.me.marker.position);
-    else if (whereis.me.inaccuratemarker)
-      whereis.map.setCenter(whereis.me.inaccuratemarker.center);
-    setMapFollowControlDiv.style.visibility = "hidden";
+    if (whereis.me.position)
+      whereis.map.setCenter(whereis.me.position);
+    var indexOfControl = whereis.map.controls[google.maps.ControlPosition.TOP_CENTER].indexOf(setMapFollowControlDiv);
+    if (indexOfControl => 0)
+      whereis.map.controls[google.maps.ControlPosition.TOP_CENTER].removeAt(indexOfControl);  
   } 
   else 
   {
-    setMapFollowControlDiv.style.visibility = "visible";
+    if (whereis.map.controls[google.maps.ControlPosition.TOP_CENTER].indexOf(setMapFollowControlDiv) < 0)
+      whereis.map.controls[google.maps.ControlPosition.TOP_CENTER].push(setMapFollowControlDiv);  
   }
 }
 
