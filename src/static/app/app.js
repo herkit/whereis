@@ -125,6 +125,13 @@ function initialize() {
     radius: 100
   });
 
+  whereis.me.trailPolyline = new google.maps.Polyline({
+    geodesic: true,
+    strokeColor: '#FF0000',
+    strokeOpacity: 0.75,
+    strokeWeight: 4
+  });
+
   whereis.me.marker = new google.maps.Marker({ 
     icon: whereis.icons.plain,
     animation: google.maps.Animation.DROP
@@ -203,24 +210,13 @@ function initialize() {
       whereis.me.position = latlng;
       whereis.me.bearing = track.gps.bearing || 0;
       whereis.me.accuracy = track.gps != undefined && track.gps.accuracy != undefined ? track.gps.accuracy : 5;
+      whereis.me.trail = [];
+
+      if (track.trail) {
+        whereis.me.trail = google.maps.geometry.encoding.decodePath(track.trail);
+      }
 
       setMapIndicator();
-
-      if (positions.length >= 2) {
-        var trackingPathCoordinates = positions.slice(-20).map(function(position) { return { lat: position.lat, lng: position.lon }});
-        if(!trackingPath) {
-          trackingPath = new google.maps.Polyline({
-            path: trackingPathCoordinates,
-            geodesic: true,
-            strokeColor: '#FF0000',
-            strokeOpacity: 0.75,
-            strokeWeight: 4
-          });
-          trackingPath.setMap(whereis.map);
-        } else {
-          trackingPath.setPath(trackingPathCoordinates);
-        }
-      }
     }
 
     showPoweredBy();
@@ -267,6 +263,9 @@ function setMapIndicator() {
     if (!whereis.me.inaccuratemarker.map)
       whereis.me.inaccuratemarker.setMap(whereis.map);
 
+    if (whereis.me.trailPolyline.map)
+      whereis.me.trailPolyline.setMap(null);
+
     whereis.me.marker.setMap(null);
   } else {
     if (whereis.tracking.mode == whereis.mode.FLIGHT)
@@ -275,6 +274,12 @@ function setMapIndicator() {
       whereis.me.marker.setIcon(whereis.icons.plain);
 
     whereis.me.marker.setPosition(whereis.me.position);
+
+    if (whereis.me.trail.length >= 2) {
+      whereis.me.trailPolyline.setPath(whereis.me.trail);
+      if (!whereis.me.trailPolyline.map)
+        whereis.me.trailPolyline.setMap(whereis.map);
+    }
 
     if (!whereis.me.marker.map) 
       whereis.me.marker.setMap(whereis.map);

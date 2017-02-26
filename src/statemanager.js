@@ -5,7 +5,8 @@ var
   Promise = require('bluebird'),
   db = require('./server/db'),
   io = require('./server/client-io'),
-  LatLon = require('./static/app/geo');
+  LatLon = require('./static/app/geo'),
+  polyUtil = require('polyline-encoded');
 
 var state = { };
 
@@ -104,6 +105,7 @@ function init() {
       log.debug('Exiting flightmode, setting location to', toLoc);
       current.state = 'track';
       current.data = { datetime: new Date(current.data.to.timestamp * 1000).toISOString(), geo: { latitude: toLoc.lat, longitude: toLoc.lng }, gps: { accuracy: 500 }, address: { address: current.data.to.name } };
+      history = [current.data];
       emitCurrent(io);
     }, (flight.to.timestamp - Date.getUtcTimestamp()) * 1000);      
     emitCurrent(io);
@@ -126,12 +128,29 @@ function init() {
         dataToSend = { geo: { latitude: maskedLatLon.lat, longitude: maskedLatLon.lon }, gps: { accuracy: 1000 + Math.min(age/2000, 1000)}, address: current.data.address };
       }
     }
+    dataToSend.trail = getHistoryTrail();
 
     socket.emit(current.state, dataToSend);
   }
 
+  function getHistoryTrail() {
+    var trail = history.filter(function(entry) {
+
+      var d = new Date(entry.datetime);
+      var tstamp = d.getTime() / 1000 + d.getTimezoneOffset() * 60;
+      var now = Date.getUtcTimestamp();
+      debug('age', now - tstamp);
+      return (now - tstamp < 300);
+    }).map(function(entry) {
+      return { lat: entry.geo.latitude, lng: entry.geo.longitude };
+    });
+
+    debug('trail', trail);
+    return polyUtil.encode(trail);
+  }
+
   io.on('connection', function(socket) {
-    debug("socket io connection session request", socket.request)
+    //debug("socket io connection session request", socket.request)
     socket.on('iam', function(me) {
       events.emit('viewer:joined', me);
       emitCurrent(socket);
