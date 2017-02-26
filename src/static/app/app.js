@@ -141,8 +141,7 @@ function initialize() {
   whereis.map.addListener('center_changed', mapManuallyChanged);
   whereis.map.addListener('zoom_changed', setMapIndicator);
 
-  setMapFollowControlDiv = document.createElement('div');
-  setMapFollowControl = new SetMapFollowControl(setMapFollowControlDiv, whereis.map);
+  setMapFollowControl = new SetMapFollowControl(whereis.map);
   quickInfoDiv = document.getElementById('quickInfo');
   locationDiv = document.getElementById('currentLocation');
 
@@ -162,7 +161,7 @@ function initialize() {
       });
   whereis.map.setStreetView(whereis.panorama);
 
-  setMapFollowControlDiv.index = 1;
+  setMapFollowControl.index = 1;
 
   socket = io.connect();
 
@@ -304,14 +303,14 @@ function setMapFollow(follow) {
   {
     if (whereis.me.position)
       whereis.map.setCenter(whereis.me.position);
-    var indexOfControl = whereis.map.controls[google.maps.ControlPosition.TOP_CENTER].indexOf(setMapFollowControlDiv);
+    var indexOfControl = whereis.map.controls[google.maps.ControlPosition.TOP_CENTER].indexOf(setMapFollowControl);
     if (indexOfControl => 0)
       whereis.map.controls[google.maps.ControlPosition.TOP_CENTER].removeAt(indexOfControl);  
   } 
   else 
   {
-    if (whereis.map.controls[google.maps.ControlPosition.TOP_CENTER].indexOf(setMapFollowControlDiv) < 0)
-      whereis.map.controls[google.maps.ControlPosition.TOP_CENTER].push(setMapFollowControlDiv);  
+    if (whereis.map.controls[google.maps.ControlPosition.TOP_CENTER].indexOf(setMapFollowControl) < 0)
+      whereis.map.controls[google.maps.ControlPosition.TOP_CENTER].push(setMapFollowControl);  
   }
 }
 
@@ -356,7 +355,7 @@ function showPoweredBy() {
   credits.style.fontSize = '1em';
 }
 
-function SetMapFollowControl(controlDiv, map) {
+function SetMapFollowControl(map) {
   var controlUI = document.createElement('div');
   controlUI.style.backgroundColor = '#fff';
   controlUI.style.border = '2px solid #fff';
@@ -367,7 +366,6 @@ function SetMapFollowControl(controlDiv, map) {
   controlUI.style.marginBottom = '5px';
   controlUI.style.textAlign = 'center';
   controlUI.title = 'Click to recenter the map';
-  controlDiv.appendChild(controlUI);
 
   var controlText = document.createElement('div');
   controlText.style.color = 'rgb(25,25,25)';
@@ -379,4 +377,5 @@ function SetMapFollowControl(controlDiv, map) {
   controlUI.addEventListener('click', function() {
     setMapFollow(true);
   });
+  return controlUI;
 }
