@@ -1,5 +1,6 @@
 var events = require('./events'),
     log = require('./lib/log'),
+    db = require('./server/db'),
     debug = require('debug')('whereis:web');
 
 module.exports = function(app) {
@@ -20,6 +21,14 @@ module.exports = function(app) {
 
   app.get('/admin', function(req, res) {
     res.render('pages/admin/index', { layout: 'admin', googleapikey: process.env.GOOGLE_MAPS_CLIENT_KEY });  
+  });
+
+  app.get('/api/statesvisited', function(req, res) {
+    db('geolookup').distinct('state', 'state_long').where('country', 'US').then(function(states) {
+      res.status(200).json(states);
+    }).catch(function() {
+      res.status(404).end();
+    })
   });
 
 }

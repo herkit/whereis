@@ -117,6 +117,10 @@ function initialize() {
     styles: whereis.mapstyle
   });
 
+  if (whereis.richinfo.initialize) {
+    whereis.richinfo.initialize();
+  }
+
   whereis.me.inaccuratemarker = new google.maps.Circle({
     strokeColor: '#FF0000',
     strokeOpacity: 0.8,
@@ -147,7 +151,7 @@ function initialize() {
 
   panoramaDiv = document.createElement('div');
   panoramaDiv.style.width = '100%';
-  panoramaDiv.style.height = '200px';
+  panoramaDiv.style.height = '260px';
 
   quickInfoDiv.appendChild(panoramaDiv);
 
@@ -379,3 +383,4 @@ function SetMapFollowControl(map) {
   });
   return controlUI;
 }
+
