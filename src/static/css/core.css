@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css?family=Lato|Open+Sans');
+
 html,body {
   height: 100%;
   margin: 0;
@@ -26,7 +28,7 @@ div#poweredby {
   top: 5px;
   cursor: pointer;
   max-width:380px;
-  font-family: Product Sans, Relish, Helvetica, Arial, sans-serif; 
+  font-family: 'Open Sans', Relish, Helvetica, Arial, sans-serif; 
 }
 
 #quickInfo {
@@ -34,7 +36,8 @@ div#poweredby {
 }
 
 #currentLocation h1 {
-  font-family: 'Russo One', sans-serif;
+  font-family: 'Lato', sans-serif;
+  text-transform: uppercase;
   font-size: 40px;
   margin: 0px;
 }
@@ -49,7 +52,7 @@ div#poweredby {
     width: 408px;
     height: 100%;
     margin: 0px !important;
-    padding: 10px;
+    padding: 0px 10px 0px 10px;
     top: 0px;
     left: 0px;
     background-color: #FFF;
@@ -77,13 +80,32 @@ div#poweredby {
   border-color: #333;
 }
 
+.wi-streetview + h1, .wi-streetview + h2, .wi-streetview + h3 {
+  margin-top: 0px !important;
+}
+
+#quickInfo h2 {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
 .wi-quickinfo h2 {
   background-color: #0066CC;
   color: #FFF;
   margin-left: -10px;
   margin-right: -10px;
   padding: 5px 10px 5px 10px;
-  font-family: 'Russo One', sans-serif;
+  font-family: 'Lato', sans-serif;
+}
+
+.wi-streetview {
+  width: 100%;
+  margin-top: -10px;
+  margin-left: -10px;
+  margin-right: -10px;
+  padding-left: 10px;
+  padding-right: 10px;
+  height: 260px;
 }
 
 @media all and (max-width: 810px) {

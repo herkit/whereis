@@ -150,10 +150,9 @@ function initialize() {
   locationDiv = document.getElementById('currentLocation');
 
   panoramaDiv = document.createElement('div');
-  panoramaDiv.style.width = '100%';
-  panoramaDiv.style.height = '260px';
+  panoramaDiv.className = 'wi-streetview';
 
-  quickInfoDiv.appendChild(panoramaDiv);
+  quickInfoDiv.insertBefore(panoramaDiv, quickInfoDiv.firstChild);
 
   whereis.panorama = new google.maps.StreetViewPanorama(
       panoramaDiv, {
@@ -163,7 +162,14 @@ function initialize() {
           pitch: 10
         }
       });
-  whereis.map.setStreetView(whereis.panorama);
+  whereis.panorama.addListener('position_changed', function() {
+    console.log("panorama position_changed", whereis.panorama.getStatus());
+    if (whereis.panorama.getStatus() == "OK") {
+      panoramaDiv.style.display = "";
+    } else {
+      panoramaDiv.style.display = "none";
+    }
+  })
 
   setMapFollowControl.index = 1;
 
@@ -185,7 +191,7 @@ function initialize() {
   });
 
   socket.on('track', function(track) {
-    console.log(track);
+    console.log("lat:",track.geo.latitude,"lng:",track.geo.longitude,"heading:",track.geo.bearing);
     var latlng = { lat: track.geo.latitude, lng: track.geo.longitude };
     var latlon = new LatLon(track.geo.latitude, track.geo.longitude);
 
@@ -210,7 +216,7 @@ function initialize() {
     if (whereis.tracking.mode == whereis.mode.TRACKING) {
       var accuracy = track.gps != undefined && track.gps.accuracy != undefined ? track.gps.accuracy : 5;
       whereis.me.position = new google.maps.LatLng(latlng.lat, latlng.lng);
-      whereis.me.bearing = track.gps.bearing || 0;
+      whereis.me.bearing = track.geo.bearing || 0;
       whereis.me.accuracy = track.gps != undefined && track.gps.accuracy != undefined ? track.gps.accuracy : 5;
       whereis.me.trail = [];
 
@@ -278,6 +284,11 @@ function setMapIndicator() {
 
     whereis.me.marker.setPosition(whereis.me.position);
 
+    if (whereis.panorama) {
+      whereis.panorama.setPosition(whereis.me.position);
+      whereis.panorama.setPov({ heading: whereis.me.bearing, pitch: 0 });
+    }
+
     if (whereis.me.trail.length >= 2) {
       whereis.me.trailPolyline.setPath(whereis.me.trail);
       if (!whereis.me.trailPolyline.map)
@@ -293,12 +304,6 @@ function setMapIndicator() {
 
   if (whereis.tracking.mapFollow)
     whereis.map.setCenter(whereis.me.position);  
-}
-
-function setMyPosition(latlng, icon) {
-  if (whereis.panorama) {
-    whereis.panorama.setPosition(latlng);
-  }
 }
 
 function setMapFollow(follow) {

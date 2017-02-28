@@ -50,7 +50,7 @@ whereis.richinfo = {
       { 'short': 'WI', 'long': 'Wisconsin' },
       { 'short': 'WY', 'long': 'Wyoming' }
     ],
-  visited: ['FL', 'GA'],
+  visited: [],
   initialize: function(pane) {
     var pane = document.getElementById('quickInfo');
     var state = new whereis.richinfo.StateMap();
@@ -65,17 +65,20 @@ whereis.richinfo = {
     header.innerText='States visited so far';
     self.container.appendChild(header);
 
-    whereis.richinfo.states.forEach(function(state) {
-      var stateDiv = document.createElement('div');
-      stateDiv.innerText = state.short;
-      stateDiv.title = state.long;
-      stateDiv.className = 'wi-state';
-      if (whereis.richinfo.visited.indexOf(state.short) >= 0) {
-        stateDiv.className += ' wi-visited'
-      }
-      self.container.appendChild(stateDiv);
-    })
-
+    $.ajax('api/statesvisited').done(function(data) {
+      whereis.richinfo.visited = data.map(function(state) { return state.state; });
+      whereis.richinfo.states.forEach(function(state) {
+        var stateDiv = document.createElement('div');
+        stateDiv.innerText = state.short;
+        stateDiv.id = 'wi-state-' + state.short;
+        stateDiv.title = state.long;
+        stateDiv.className = 'wi-state';
+        if (whereis.richinfo.visited.indexOf(state.short) >= 0) {
+          stateDiv.className += ' wi-visited'
+        }
+        self.container.appendChild(stateDiv);
+      })
+    });
     this.setPane = function(pane) {
       if (pane) {
         _pane = pane;

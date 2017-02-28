@@ -30,7 +30,7 @@ module.exports = {
           geo: {
             latitude: gpsserver.fixGeo(lat, ns),
             longitude: gpsserver.fixGeo(lng, ew),
-            bearing: course
+            bearing: parseFloat(course)
           },
           speed: {
             knots: Math.round(parseFloat(speed) * 1000) / 1000,
