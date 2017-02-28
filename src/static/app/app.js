@@ -163,7 +163,6 @@ function initialize() {
         }
       });
   whereis.panorama.addListener('position_changed', function() {
-    console.log("panorama position_changed", whereis.panorama.getStatus());
     if (whereis.panorama.getStatus() == "OK") {
       panoramaDiv.style.display = "";
     } else {
@@ -389,3 +388,14 @@ function SetMapFollowControl(map) {
   return controlUI;
 }
 
+
+// Polyfill Date
+Date.getUtcTimestamp = function() {
+  var now = new Date();
+  return Math.floor(now.getTime() / 1000 + now.getTimezoneOffset() * 60);
+}
+
+Date.getUtcTime = function() {
+  var now = new Date();
+  return Math.floor(now.getTime() + (now.getTimezoneOffset() * 60000));
+}

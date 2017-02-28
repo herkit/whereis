@@ -108,6 +108,12 @@ div#poweredby {
   height: 260px;
 }
 
+.wi-dayview {
+  font-family: 'Lato', sans serif;
+  font-size: 36px;
+  font-weight: bold;
+}
+
 @media all and (max-width: 810px) {
   .sub + .sub::before {
     content: ", ";

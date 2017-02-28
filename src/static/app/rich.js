@@ -55,6 +55,8 @@ whereis.richinfo = {
     var pane = document.getElementById('quickInfo');
     var state = new whereis.richinfo.StateMap();
     state.setPane(pane);
+    var dayview = new whereis.richinfo.DayView(1492646280, 1507161480);
+    dayview.setPane(pane);
   },
   StateMap: function() {
     var self = this;
@@ -79,7 +81,37 @@ whereis.richinfo = {
         self.container.appendChild(stateDiv);
       })
     });
-    this.setPane = function(pane) {
+    self.setPane = function(pane) {
+      if (pane) {
+        _pane = pane;
+        pane.appendChild(self.container);
+      } else {
+        if (_pane)
+          _pane.removeChild(self.container);
+        _pane = null;
+      }
+    }
+  },
+  DayView: function(tripstart, tripend) {
+    var self = this;
+    self.container = document.createElement('div');
+    self.container.className = 'wi-dayview';
+    var now = Date.getUtcTimestamp();
+
+    self.display = document.createElement('div');
+
+    function update() {
+      var day = Math.floor((now - tripstart) / 86400);
+      var totaldays = Math.ceil((tripend - tripstart) / 86400);
+      self.display.innerText = "Day " + day + " / " + totaldays;
+      setTimeout(update, 10000);
+    };
+
+    update();
+
+    self.container.appendChild(self.display);
+
+    self.setPane = function(pane) {
       if (pane) {
         _pane = pane;
         pane.appendChild(self.container);
