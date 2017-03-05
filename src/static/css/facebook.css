@@ -2,7 +2,7 @@ body {
     max-width: 810px;
 }
 
-#whereis-mapCanvas {
+.wi-mapcanvas {
   max-height: 450px;
   max-width: 810px;
   height: 100%;

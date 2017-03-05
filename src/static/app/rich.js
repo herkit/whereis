@@ -61,7 +61,7 @@ whereis.richinfo = {
   StateMap: function() {
     var self = this;
     self.container = document.createElement('div');
-    self.container.className = 'wi-statemap';
+    self.container.className = 'wi-statemap wi-quickinfo-container';
     self._pane = null;
     var header = document.createElement('h2');
     header.innerText='States visited so far';
@@ -95,7 +95,7 @@ whereis.richinfo = {
   DayView: function(tripstart, tripend) {
     var self = this;
     self.container = document.createElement('div');
-    self.container.className = 'wi-dayview';
+    self.container.className = 'wi-dayview wi-quickinfo-container';
     var now = Date.getUtcTimestamp();
 
     self.display = document.createElement('div');

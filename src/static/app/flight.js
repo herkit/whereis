@@ -1,15 +1,5 @@
   LatLon.prototype.toLatLng = function() {
-    return { lat: this.lat, lng: this.lon };
-  }
-
-  Date.getUtcTimestamp = function() {
-    var now = new Date();
-    return Math.floor(now.getTime() / 1000 + now.getTimezoneOffset() * 60);
-  }
-
-  Date.getUtcTime = function() {
-    var now = new Date();
-    return Math.floor(now.getTime() + (now.getTimezoneOffset() * 60000));
+    return new google.maps.LatLng(this.lat, this.lon);
   }
 
   function fadeOut(seconds, callback) {

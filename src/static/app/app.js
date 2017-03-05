@@ -150,7 +150,7 @@ function initialize() {
   locationDiv = document.getElementById('currentLocation');
 
   panoramaDiv = document.createElement('div');
-  panoramaDiv.className = 'wi-streetview';
+  panoramaDiv.className = 'wi-streetview wi-feature';
 
   quickInfoDiv.insertBefore(panoramaDiv, quickInfoDiv.firstChild);
 
@@ -162,6 +162,7 @@ function initialize() {
           pitch: 10
         }
       });
+
   whereis.panorama.addListener('position_changed', function() {
     if (whereis.panorama.getStatus() == "OK") {
       panoramaDiv.style.display = "";
@@ -283,15 +284,17 @@ function setMapIndicator() {
 
     whereis.me.marker.setPosition(whereis.me.position);
 
-    if (whereis.panorama) {
-      whereis.panorama.setPosition(whereis.me.position);
-      whereis.panorama.setPov({ heading: whereis.me.bearing, pitch: 0 });
-    }
+    if (whereis.tracking.mode == whereis.mode.TRACKING) {
+      if (whereis.panorama) {
+        whereis.panorama.setPosition(whereis.me.position);
+        whereis.panorama.setPov({ heading: whereis.me.bearing, pitch: 0 });
+      }
 
-    if (whereis.me.trail.length >= 2) {
-      whereis.me.trailPolyline.setPath(whereis.me.trail);
-      if (!whereis.me.trailPolyline.map)
-        whereis.me.trailPolyline.setMap(whereis.map);
+      if (whereis.me.trail && whereis.me.trail.length >= 2) {
+        whereis.me.trailPolyline.setPath(whereis.me.trail);
+        if (!whereis.me.trailPolyline.map)
+          whereis.me.trailPolyline.setMap(whereis.map);
+      }
     }
 
     if (!whereis.me.marker.map) 
