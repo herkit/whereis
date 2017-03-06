@@ -28,6 +28,10 @@
   function initialize() {
 
     window.socket.on('flight', function(flightdata) {
+      if (whereis.tracking.flightsim.pathRemoveTimeout) {
+        clearTimeout(whereis.tracking.flightsim.pathRemoveTimeout);
+        delete whereis.tracking.flightsim.pathRemoveTimeout;
+      }
 
       setLocationData([flightdata.flightnumber, flightdata.from.name +  ' to ' + flightdata.to.name, flightdata.airline.name]);
 
@@ -46,6 +50,7 @@
       showPoweredBy();
 
       whereis.tracking.flightsim.flightPlan = [flightdata.from.location, flightdata.to.location];
+
       if (!whereis.tracking.flightsim.currentPath)
       {
         whereis.tracking.flightsim.currentPath = new google.maps.Polyline({
@@ -55,9 +60,9 @@
           strokeOpacity: 0.15,
           strokeWeight: 4
         });
-      } else {
-        whereis.tracking.flightsim.currentPath.setPath(whereis.tracking.flightsim.flightPlan);
       }
+      whereis.tracking.flightsim.currentPath.setPath(whereis.tracking.flightsim.flightPlan);
+      whereis.tracking.flightsim.currentPath.setMap(whereis.map);
 
       if (!whereis.tracking.flightsim.startIndicator) {
         whereis.tracking.flightsim.startIndicator = new google.maps.Marker({
@@ -69,12 +74,11 @@
             strokeWeight: 0,
             anchor: new google.maps.Point(6, 6) 
           },
-          position: flightdata.from.location,
-          map: whereis.map
+          position: flightdata.from.location
         })
-      } else {
-        whereis.tracking.flightsim.startIndicator.setMap(whereis.map);
       }
+      whereis.tracking.flightsim.startIndicator.setPosition(flightdata.from.location);
+      whereis.tracking.flightsim.startIndicator.setMap(whereis.map);
 
       if (!whereis.tracking.flightsim.flightPathSoFar) {
         whereis.tracking.flightsim.flightPathSoFar = new google.maps.Polyline({
@@ -88,12 +92,10 @@
             repeat: '20px'
           }]
         });
-      } else {
-        whereis.tracking.flightsim.flightPathSoFar.setPath([ whereis.tracking.flightsim.flightdata.from.location, whereis.tracking.flightsim.flightdata.from.location ]);
-        whereis.tracking.flightsim.flightPathSoFar.setVisible(true);
       }
+
+      whereis.tracking.flightsim.flightPathSoFar.setPath([ whereis.tracking.flightsim.flightdata.from.location, whereis.tracking.flightsim.flightdata.from.location ]);
       whereis.tracking.flightsim.flightPathSoFar.setMap(whereis.map);
-      whereis.tracking.flightsim.currentPath.setMap(whereis.map);
 
       zoomToObject(whereis.tracking.flightsim.currentPath);
       
@@ -106,6 +108,45 @@
       whereis.me.position = whereis.tracking.flightsim.currentLatLon.toLatLng();
       whereis.me.accuracy = 1;
       setMapIndicator();
+
+      function updateFlight() 
+      {
+        var currentTime = Date.getUtcTime();
+        if (currentTime >= whereis.tracking.flightsim.flightdata.from.timestamp * 1000) {
+          var progress = (currentTime - whereis.tracking.flightsim.startTime * 1000) / whereis.tracking.flightsim.flightTime / 1000;
+          
+          if (currentTime < whereis.tracking.flightsim.endTime * 1000) {
+            whereis.tracking.flightsim.currentLatLon = whereis.tracking.flightsim.startLatLon.intermediatePointTo(whereis.tracking.flightsim.endLatLon, progress);
+            var bearing = whereis.tracking.flightsim.currentLatLon.bearingTo(whereis.tracking.flightsim.endLatLon);
+            whereis.icons.plane.rotation = bearing;
+
+            whereis.tracking.flightsim.
+            flightPathSoFar.
+            setPath([
+              whereis.tracking.flightsim.startLatLon.toLatLng(), 
+              whereis.tracking.flightsim.currentLatLon.toLatLng()
+            ]);
+
+            whereis.me.position = whereis.tracking.flightsim.currentLatLon.toLatLng();
+            whereis.me.accuracy = 1;
+            setTimeout(updateFlight, 500);
+          } else {
+            whereis.tracking.mode = whereis.mode.TRACKING;
+            whereis.tracking.flightsim.currentPath.setMap(null);
+            setTimeout(function() {
+              if (whereis.tracking.mode !== whereis.mode.FLIGHT)
+              {
+                whereis.tracking.flightsim.flightPathSoFar.setMap(null);
+                whereis.tracking.flightsim.startIndicator.setMap(null);
+              }
+            }, 2500);
+          }
+
+          setMapIndicator();
+        }
+      }
+
+      updateFlight();
 
       whereis.tracking.flightsim.interval = setInterval(function() {
         var currentTime = Date.getUtcTime();
@@ -120,8 +161,11 @@
 
             whereis.tracking.flightsim.currentPath.setMap(null);
             setTimeout(function() {
-              whereis.tracking.flightsim.flightPathSoFar.setMap(null);
-              whereis.tracking.flightsim.startIndicator.setMap(null)
+              if (whereis.tracking.mode !== whereis.mode.FLIGHT)
+              {
+                whereis.tracking.flightsim.flightPathSoFar.setMap(null);
+                whereis.tracking.flightsim.startIndicator.setMap(null);
+              }
             }, 2500);
           }
           whereis.tracking.flightsim.

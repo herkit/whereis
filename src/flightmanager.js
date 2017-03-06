@@ -31,12 +31,10 @@ function init() {
     })
   })
   events.on('created:flight', function(data) {
+    debug("new flight added", data);
     upcomingFlights.push(data);
-    upcomingFlights.sort(function(a, b) {
-      if (a.from.timestamp > b.from.timestamp) return -1;
-      if (a.from.timestamp < b.from.timestamp) return 1;
-      return 0;
-    });
+    upcomingFlights.sort(byFromTime);
+    debug("upcomingFlights", upcomingFlights.map(function(flight) { return flight.from.timestamp; }));
     checkForCurrentFlight();
   })
 
@@ -64,10 +62,15 @@ function init() {
     }
   );
 
-  function checkForCurrentFlight() {
+  function checkForCurrentFlight() 
+  {
     debug('checkForCurrentFlight()');
     var now = Date.getUtcTimestamp();
+    // remove finished flights
+    while(upcomingFlights.length > 0 && upcomingFlights[0].to.timestamp <= now) upcomingFlights.shift();
+
     if (upcomingFlights.length > 0) {
+
       if (nextFlightTimeout)
         clearTimeout(nextFlightTimeout);
 
@@ -76,13 +79,13 @@ function init() {
 
       debug("now", now, "firstFlight", firstFlight);
 
-      if (firstFlight.from.timestamp < now && firstFlight.to.timestamp > now) {
+      if (firstFlight.from.timestamp <= now && firstFlight.to.timestamp > now) {
         setCurrentFlight(firstFlight);
       } else {
         var msToNextCheck = (firstFlight.from.timestamp - now) * 1000;
         if (msToNextCheck > 2147483647) 
           msToNextCheck = 2147483647;
-        
+
         debug("setting timeout to check for flight:", msToNextCheck);
         nextFlightTimeout = setTimeout(
           function() { 
@@ -96,14 +99,23 @@ function init() {
   }
 
 
-  function setCurrentFlight(flight) {
+  function setCurrentFlight(flight) 
+  {
     events.emit('flight_started', flight);
     currentFlightTimeout = setTimeout(function() {
       events.emit('flight_ended', flight);
+      checkForCurrentFlight();
     }, 
     (flight.to.timestamp - Date.getUtcTimestamp()) * 1000)
   }
 
+}
+
+function byFromTime(a, b) 
+{
+  if (a.from.timestamp < b.from.timestamp) return -1;
+  if (a.from.timestamp > b.from.timestamp) return 1;
+  return 0;
 }
 
 
