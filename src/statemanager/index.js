@@ -1,12 +1,12 @@
 var 
-  events = require('./events'),
-  log = require('./lib/log'),
+  events = require('../events'),
+  log = require('../lib/log'),
   debug = require('debug')('whereis:statemanager'),
   Promise = require('bluebird'),
-  io = require('./server/client-io'),
-  LatLon = require('./static/app/geo'),
-  flightmanager = require('./flightmanager'),
-  trackingmanager = require('./trackingmanager');
+  io = require('../server/client-io'),
+  LatLon = require('../static/app/geo'),
+  flightmanager = require('./flight'),
+  trackingmanager = require('./tracking');
 
 var state = { };
 

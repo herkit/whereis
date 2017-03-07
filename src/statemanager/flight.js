@@ -1,9 +1,9 @@
 var 
-  events = require('./events'),
-  log = require('./lib/log'),
-  db = require('./server/db'),
+  events = require('../events'),
+  log = require('../lib/log'),
+  db = require('../server/db'),
   debug = require('debug')('whereis:statemanager:flight'),
-  io = require('./server/client-io');
+  io = require('../server/client-io');
 
 
 var upcomingFlights = [];
