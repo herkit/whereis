@@ -4,8 +4,10 @@ var events = require('../events'),
     LatLon = require('../static/app/geo'),
     polyUtil = require('polyline-encoded');
 
+var minimumMovement = 20;
 var history = {};
 var currentDevice;
+var isActive = false;
 
 function init() {
   events.on('track', function(track) {
@@ -17,7 +19,7 @@ function init() {
     checkIfActive(deviceId);
     debug("currentDevice", currentDevice, "thisDevice", deviceId);
 
-    if (deviceId === currentDevice)
+    if (deviceId === currentDevice && isActive)
       events.emit('lasttrack', track)
   });
 
@@ -42,7 +44,7 @@ function checkIfActive(deviceId) {
   var activity = Object.keys(history).map(function(deviceId) {
     var maxMovement = 
       history[deviceId].
-      filter(forSeconds(300)).
+      filter(forSeconds(240)).
       map(function(track) 
       {
         return new LatLon(track.geo.latitude, track.geo.longitude);
@@ -63,7 +65,8 @@ function checkIfActive(deviceId) {
   })
   var mostActive = activity[0];
   currentDevice = mostActive.deviceId;
-  debug("activity", activity, "mostActive", mostActive);
+  isActive = (mostActive.maxMoved > minimumMovement);
+  debug("activity", activity, "mostActive", mostActive, "isActive", isActive);
 }
 
 function getHistoryTrail(deviceId) {
