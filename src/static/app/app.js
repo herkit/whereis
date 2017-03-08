@@ -166,8 +166,10 @@ function initialize() {
   whereis.panorama.addListener('position_changed', function() {
     if (whereis.panorama.getStatus() == "OK") {
       panoramaDiv.style.display = "";
+      whereis.panorama.setVisible(true);
     } else {
       panoramaDiv.style.display = "none";
+      whereis.panorama.setVisible(false);
     }
   })
 
