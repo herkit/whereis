@@ -19,7 +19,8 @@ angular
       controller: LoginDialogController,
       templateUrl: 'app/dialogs/login.html',
       parent: angular.element(document.body),
-      clickOutsideToClose:true
+      fullscreen: true,
+      clickOutsideToClose:false
     })
     .then(
       function(login) {

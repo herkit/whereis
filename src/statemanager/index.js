@@ -74,10 +74,10 @@ function emitCurrent(socket)
     var tracktime = new Date(current.data.datetime);
     debug("is stale:", tracktime.getTime(), Date.now());
     var age = Date.now() - tracktime.getTime();
-    if (age > staleLimit || settings.privacymode) {
+    if (age > staleLimit || settings.privacymode == true) {
       var currentLatLon = new LatLon(current.data.geo.latitude, current.data.geo.longitude);
       var bearing = getRandomInt(0, 360);
-      var addDistance = getRandomInt(100, 500);
+      var addDistance = getRandomInt(50, 200);
       debug("adding ", addDistance, "m on bearing", bearing);
       var maskedLatLon = currentLatLon.destinationPoint(addDistance, bearing);
       dataToSend = { geo: { latitude: maskedLatLon.lat, longitude: maskedLatLon.lon }, gps: { accuracy: 250 + Math.min(age/2000, 1000)}, address: current.data.address };
