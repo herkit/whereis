@@ -371,20 +371,20 @@ function showPoweredBy() {
 function SetMapFollowControl(map) {
   var controlUI = document.createElement('div');
   controlUI.style.backgroundColor = '#fff';
-  controlUI.style.border = '2px solid #fff';
   controlUI.style.borderRadius = '3px';
   controlUI.style.boxShadow = 'rgba(0, 0, 0, 0.298039) 0px 1px 4px -1px';
   controlUI.style.cursor = 'pointer';
   controlUI.style.marginTop = '10px';
-  controlUI.style.marginBottom = '5px';
+  controlUI.style.marginBottom = '0px';
   controlUI.style.textAlign = 'center';
   controlUI.title = 'Click to recenter the map';
 
   var controlText = document.createElement('div');
   controlText.style.color = 'rgb(25,25,25)';
+  controlText.style.paddingTop = '2px';
   controlText.style.paddingLeft = '5px';
   controlText.style.paddingRight = '5px';
-  controlText.innerHTML = '<img src="img/ic_gps_fixed_black_24px.svg" style="display: inline; height: 22px">';
+  controlText.innerHTML = '<i class="material-icons">gps_fixed</i>';
   controlUI.appendChild(controlText);
 
   controlUI.addEventListener('click', function() {

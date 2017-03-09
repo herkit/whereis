@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css?family=Lato|Open+Sans');
+@import url('https://fonts.googleapis.com/css?family=Lato|Open+Sans|Material+Icons');
 
 html,body {
   height: 100%;
@@ -129,6 +129,43 @@ div h2:first-of-type {
   font-family: 'Lato', sans serif;
   font-size: 36px;
   font-weight: bold;
+}
+
+.material-icons {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;  /* Preferred icon size */
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+
+  /* Support for all WebKit browsers. */
+  -webkit-font-smoothing: antialiased;
+  /* Support for Safari and Chrome. */
+  text-rendering: optimizeLegibility;
+
+  /* Support for Firefox. */
+  -moz-osx-font-smoothing: grayscale;
+
+  /* Support for IE. */
+  font-feature-settings: 'liga';
+}
+
+.wi-float-action {
+  position: absolute;
+  display: inline;
+  z-index: 999;
+  left: 5px;
+  top: 5px;
+}
+
+a.wi-float-action {
+  color: #333;
 }
 
 @media all and (max-width: 810px) {

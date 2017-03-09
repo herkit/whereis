@@ -3,15 +3,13 @@ body {
 }
 
 .wi-mapcanvas {
-  max-height: 450px;
   max-width: 810px;
-  height: 100%;
+  bottom: 90px;
 }
 
 #wrapper {
-  max-height: 450px;
   max-width: 810px;
-  height: 75%;
+  height: 100%;
 }
 
 @media screen and (max-height: 350px) {
