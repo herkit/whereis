@@ -8,6 +8,7 @@ var cache = require('./lib/geoloccache'),
     db = require('./server/db'),
     model = require('./server/model'),
     events = require('./events'),
+    statemanager = require('./statemanager'),
     IC = require('./lib/iatacodes');
 
 var ic = new IC(process.env.IATACODES_API_KEY);
@@ -60,6 +61,10 @@ module.exports = function(app) {
       });
     })(req, res, next);
   });
+
+  app.get('/api/settings', isAuthenticated, function(req, res) {
+
+  })
 
   app.post('/api/command/:command', isAuthenticated, function(req, res) {
     events.emit('command:' + req.params.command, req.body);

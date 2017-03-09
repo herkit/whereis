@@ -162,6 +162,7 @@ angular
         active: true
       }
     ]
+    $scope.sendCommand = adminApi.sendCommand;
   }
 );
 

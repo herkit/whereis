@@ -18,7 +18,7 @@
     <md-list>
       <md-list-item>
         <p>Privacy mode</p>
-        <md-switch ng-model="privacymode"></md-switch>
+        <md-switch ng-model="privacymode" ng-change="sendCommand('setprivacymode', { value: privacymode })"></md-switch>
       </md-list-item>
       <md-subheader class="md-no-sticky">Devices</md-subheader>
       <md-list-item ng-repeat="device in devices">

@@ -14,6 +14,10 @@ var history = [];
 var trackTimeout;
 var staleLimit = 120000;
 
+var settings = {
+  privacymode: false
+}
+
 var current = {
   state: 'track',
   data: {}
@@ -45,6 +49,11 @@ function init() {
     emitCurrent(io);
   });
 
+  events.on('command:setprivacymode', function(mode) {
+    settings.privacymode = mode.value;
+    emitCurrent(io);
+  })
+
   flightmanager.init();
   trackingmanager.init();
 
@@ -65,13 +74,13 @@ function emitCurrent(socket)
     var tracktime = new Date(current.data.datetime);
     debug("is stale:", tracktime.getTime(), Date.now());
     var age = Date.now() - tracktime.getTime();
-    if (age > staleLimit) {
+    if (age > staleLimit || settings.privacymode) {
       var currentLatLon = new LatLon(current.data.geo.latitude, current.data.geo.longitude);
       var bearing = getRandomInt(0, 360);
       var addDistance = getRandomInt(100, 500);
       debug("adding ", addDistance, "m on bearing", bearing);
       var maskedLatLon = currentLatLon.destinationPoint(addDistance, bearing);
-      dataToSend = { geo: { latitude: maskedLatLon.lat, longitude: maskedLatLon.lon }, gps: { accuracy: 1000 + Math.min(age/2000, 1000)}, address: current.data.address };
+      dataToSend = { geo: { latitude: maskedLatLon.lat, longitude: maskedLatLon.lon }, gps: { accuracy: 250 + Math.min(age/2000, 1000)}, address: current.data.address };
       if (dataToSend.trail)
         delete dataToSend['trail'];
     }
@@ -88,3 +97,4 @@ function getRandomInt(min, max) {
 }
 
 module.exports.init = init;
+module.exports.settings = settings;
