@@ -83,12 +83,12 @@ whereis.richinfo = {
     });
     self.setPane = function(pane) {
       if (pane) {
-        _pane = pane;
+        self._pane = pane;
         pane.appendChild(self.container);
       } else {
-        if (_pane)
-          _pane.removeChild(self.container);
-        _pane = null;
+        if (self._pane)
+          self._pane.removeChild(self.container);
+        self._pane = null;
       }
     }
   },
@@ -96,6 +96,7 @@ whereis.richinfo = {
     var self = this;
     self.container = document.createElement('div');
     self.container.className = 'wi-dayview wi-quickinfo-container';
+    self._pane = null;
     var now = Date.getUtcTimestamp();
 
     self.display = document.createElement('div');
@@ -113,12 +114,12 @@ whereis.richinfo = {
 
     self.setPane = function(pane) {
       if (pane) {
-        _pane = pane;
+        self._pane = pane;
         pane.appendChild(self.container);
       } else {
-        if (_pane)
-          _pane.removeChild(self.container);
-        _pane = null;
+        if (self._pane)
+          self._pane.removeChild(self.container);
+        self._pane = null;
       }
     }
   }

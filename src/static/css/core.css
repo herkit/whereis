@@ -15,7 +15,7 @@ html,body {
 
 .wi-mapcanvas {
   position: absolute;
-  left: 0px;
+  left: 408px;
   right: 0px;
   top: 0px;
   bottom: 0px;
@@ -74,14 +74,19 @@ html,body {
   margin-bottom: 5px;
   padding: 4px;
   display: inline-block;
+  font-family: 'Lato', sans-serif;
+  font-size: 14px;
+  font-weight: bold;
   text-align: center;
   color: #EEE;
   border: solid 1px #EEE;
+  border-radius: 3px;
 }
 
 .wi-state.wi-visited {
-  color: #333;
-  border-color: #333;
+  color: #FFF;
+  background-color: #ef6c00;
+  border-width: 0;
 }
 
 .wi-quickinfo + div h2 { 
@@ -103,7 +108,7 @@ div h2:first-of-type {
 }
 
 .wi-quickinfo h2 {
-  background-color: #0066CC;
+  background-color: #ef6c00;
   color: #FFF;
   margin-left: -10px;
   margin-right: -10px;
