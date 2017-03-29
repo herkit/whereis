@@ -25,10 +25,11 @@ module.exports = {
     }
 
     var position = {
-      protocol: 'xexun',
+      //protocol: 'xexun',
       geo: {},
-      gps: { speed: {} },
-      extra: { }
+      gps: {},
+      speed: {},
+      extra: {}
     }
 
     if (options.full)
@@ -42,7 +43,9 @@ module.exports = {
     position.gps.fix = parser.next() == 'A';
     position.geo.latitude = parser.nextCoordinate();
     position.geo.longitude = parser.nextCoordinate();
-    position.gps.speed.knots = parser.nextFloat();
+    position.speed.knots = parser.nextFloat();
+    position.speed.kmh = position.speed.knots * 1.852;
+    position.speed.mph = position.speed.knots * 1.151;
     position.geo.bearing = parser.nextFloat();
 
     var dateparts = [parser.nextInt(), parser.nextInt(), parser.nextInt()];

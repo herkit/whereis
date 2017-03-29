@@ -21,10 +21,11 @@ describe('xexun-basic', function() {
   valid.forEach(function(data) {
     it('should decode ' + data, function() {
       var position = xexun.parse(data);
-      assert.equal(position.protocol, 'xexun');
+      //assert.equal(position.protocol, 'xexun');
       assert.ok(position.geo.latitude !== undefined);
       assert.ok(position.geo.longitude !== undefined);
-      assert.ok(position.gps.speed.knots !== undefined);
+      //assert.ok(position.gps.speed.knots !== undefined);
+      assert.ok(position.speed.knots !== undefined);
       assert.ok(position.geo.bearing !== undefined);
       assert.ok(position.datetime !== undefined);
       assert.ok(position.gps.signal !== undefined);
@@ -65,10 +66,11 @@ describe('xexun-full', function() {
   full.forEach(function(data) {
     it('should decode ' + data, function() {
       var position = xexun.parse(data, { full: true });
-      assert.equal(position.protocol, 'xexun');
+      //assert.equal(position.protocol, 'xexun');
       assert.ok(position.geo.latitude !== undefined);
       assert.ok(position.geo.longitude !== undefined);
-      assert.ok(position.gps.speed.knots !== undefined);
+      //assert.ok(position.gps.speed.knots !== undefined);
+      assert.ok(position.speed.knots !== undefined);
       assert.ok(position.geo.bearing !== undefined);
       assert.ok(position.datetime !== undefined);
       assert.ok(position.gps.signal !== undefined);

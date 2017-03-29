@@ -34,7 +34,10 @@ then(() =>
         'tk102': 10001,
         'tk102-clone1': 10002,
         'osmand': 10003,
-        'xexun': 10004
+        'xexun': {
+          port: 10004,
+          full: true
+        }
       }
     });
 

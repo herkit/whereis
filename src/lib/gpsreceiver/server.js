@@ -9,7 +9,7 @@ gpsserver.settings = {
   timeout: 10
 }
 
-function socketServer(port, protocol) {
+function socketServer(port, protocol, options) {
   var server = net.createServer();
 
   server.on('listening', function() {
@@ -37,7 +37,7 @@ function socketServer(port, protocol) {
       gpsserver.event('data', data);
 
       if(data !== '') {
-        gps = protocol.parse(data);
+        gps = protocol.parse(data, options);
 
         if (gps) {
           gpsserver.event('track', gps);
@@ -89,11 +89,11 @@ function socketServer(port, protocol) {
   return server;
 }
 
-function httpServer(port, protocol) {
+function httpServer(port, protocol, options) {
   var http = require('http');
 
   var server = http.createServer((req, res) => {
-    var gps = protocol.parse(req, res);
+    var gps = protocol.parse(req, res, options);
     if (gps) {
       gpsserver.event('track', gps);
       res.end("HTTP/1.1 200 OK");
