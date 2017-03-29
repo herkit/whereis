@@ -1,6 +1,7 @@
 var net = require('net');
 var EventEmitter = require('events').EventEmitter;
 var gpsserver = new EventEmitter();
+var debug = require('debug')('whereis:gpsreceiver');
 
 gpsserver.settings = {
   ip: '0.0.0.0',
@@ -83,6 +84,7 @@ function socketServer(port, protocol) {
   });
 
   server.listen(port, gpsserver.settings.ip);
+  debug("listening, ip: ", gpsserver.settings.ip, " port: ", port, " protocol: ", protocol.name);
 
   return server;
 }
@@ -160,6 +162,7 @@ gpsserver.checksum = function (raw) {
 };
 
 gpsserver.fixGeo = function (one, two) {
+  
   var minutes = one.substr (-7, 7);
   var degrees = parseInt (one.replace (minutes, ''), 10);
 

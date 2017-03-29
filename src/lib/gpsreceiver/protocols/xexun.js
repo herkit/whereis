@@ -12,7 +12,7 @@ module.exports = {
     var basic = 'G[PN]RMC,(?:(\\d{2})(\\d{2})(\\d{2}))?\\.(\\d+),?([AV]),(\\d*?)(\\d?\\d\\.\\d+),([NS]),(\\d*?)(\\d?\\d\\.\\d+),([EW])?,(\\d+\\.?\\d*),(\\d+\\.?\\d*)?,(?:(\\d{2})(\\d{2})(\\d{2}))?,[^*]*\\*[0-9a-fA-F]{2}(?:\\r\\n)?,([FL]),(?:([^,]*),)?.*imei:(\\d+),';
     var parser;
     if (options.full) {
-      var full = '.*(\\d+),([^,]+)?,' + basic + '(\\d+),(-?\\d+\\.\\d+)?,[FL]:(\\d+\\.\\d+)V.+';
+      var full = '.*(\\d*)?,([^,]+)?,' + basic + '(\\d+),(-?\\d+\\.\\d+)?,[FL]:(\\d+\\.\\d+)V.+';
       parser = new Parser(full, raw);
     } else {
       parser = new Parser(basic, raw);
@@ -20,6 +20,7 @@ module.exports = {
 
     if (!parser.matches())
     {
+      debug('no match to xexun protocol!');
       return null;
     }
 

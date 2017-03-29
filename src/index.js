@@ -44,6 +44,10 @@ then(() =>
       if (trackTimeout) clearTimeout(trackTimeout);
       log.info('Tracker data: %s', track.raw);
       log.debug("Position received: " + track.geo.latitude + ", " + track.geo.longitude);
+      if (track.extra) {
+        log.debug('Deleting extra data before storing:', track.extra);
+        delete track.extra;
+      }
       db('gpslog').
       insert(model.flatten(track)).
       returning('logid').
