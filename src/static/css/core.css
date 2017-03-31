@@ -177,6 +177,9 @@ a.wi-float-action {
   .sub + .sub::before {
     content: ", ";
   }
+  .wi-mapcanvas {
+    left: 0px;
+  }  
   .wi-dayview, .wi-streetview, .wi-statemap {
     display: none;
   }
