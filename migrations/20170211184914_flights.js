@@ -6,12 +6,12 @@ exports.up = function(knex, Promise) {
     table.string('from_code');
     table.float('from_location_lat');
     table.float('from_location_lng');
-    table.timestamp('from_timestamp');
+    table.timestamp('from_timestamp').defaultTo(knex.fn.now());
     table.string('to_name');
     table.string('to_code');
     table.float('to_location_lat');
     table.float('to_location_lng');
-    table.timestamp('to_timestamp');
+    table.timestamp('to_timestamp').defaultTo(knex.fn.now());
     table.integer('createdby');
     table.timestamps();
   })

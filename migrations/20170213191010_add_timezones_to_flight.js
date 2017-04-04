@@ -2,13 +2,13 @@
 exports.up = function(knex, Promise) {
   return Promise.all([
     knex.schema.table('flights', function(table) {
-      table.int('from_timezone_dstOffset');
-      table.int('from_timezone_rawOffset');
+      table.integer('from_timezone_dstOffset');
+      table.integer('from_timezone_rawOffset');
       table.string('from_timezone_timeZoneId');
       table.string('from_timezone_timeZoneName');
       table.string('from_timezone_status');
-      table.int('to_timezone_dstOffset');
-      table.int('to_timezone_rawOffset');
+      table.integer('to_timezone_dstOffset');
+      table.integer('to_timezone_rawOffset');
       table.string('to_timezone_timeZoneId');
       table.string('to_timezone_timeZoneName');
       table.string('to_timezone_status');
