@@ -1,5 +1,6 @@
 var gpsserver = require('../server'),
     Parser = require('../parser').Parser,
+    moment = require('moment'),
     CoordinateFormat = require('../parser').CoordinateFormat,
     debug = require('debug')('whereis:gpsreceiver:protocol:xexun');
 
@@ -55,13 +56,19 @@ module.exports = {
     var allparts = dateparts.concat(timeparts);
     var date = new Date(Date.UTC.apply(null, allparts));
 
-    position.datetime = date;
+    position.datetime = date.toISOString();
+
+    var m = moment.utc(date);
 
     position.gps.signal = parser.next();
+    position.gps.time = m.format("HH:mm:ss");
+    position.gps.date = m.format("YYYY-MM-DD");
 
     position.extra.alarm = parser.next();
 
     position.id = parser.next();
+
+    debug(position);
 
     return position;
   }
