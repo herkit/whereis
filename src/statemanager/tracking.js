@@ -34,8 +34,12 @@ function init() {
     debug(history);
 
     var lasttrack = gpslog.slice(-1).pop();
-    currentDevice = lasttrack.id;
-    events.emit("lasttrack", lasttrack);
+    if (lasttrack) {
+      currentDevice = lasttrack.id;
+      events.emit("lasttrack", lasttrack);
+    }
+    else
+      currentDevice = null;
   })
 }
 
