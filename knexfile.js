@@ -1,5 +1,7 @@
 // Update with your config settings.
 
+console.log(process.env);
+
 module.exports = {
 
   development: {
@@ -12,9 +14,9 @@ module.exports = {
   production: {
     client: 'mysql',
     connection: {
-      host:     process.env.MYSQL_HOST,
+      host:     'db',
       database: process.env.MYSQL_DATABASE,
-      user:     process.env.MYSQL_USERNAME,
+      user:     process.env.MYSQL_USER,
       password: process.env.MYSQL_PASSWORD
     },
     pool: {

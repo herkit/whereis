@@ -12,7 +12,7 @@ exports.up = function(knex, Promise) {
     table.float('to_location_lat');
     table.float('to_location_lng');
     table.timestamp('to_timestamp');
-    table.int('createdby');
+    table.integer('createdby');
     table.timestamps();
   })
 };
