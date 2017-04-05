@@ -2,6 +2,7 @@ var config = require('../../knexfile.js'),
     env = process.env.NODE_ENV || 'development',
     model = require('./model'),
     moment = require('moment'),
+    debug = require('debug')('whereis:db')
     knex = require('knex')(config[env]);
 
 function init() {
@@ -22,6 +23,7 @@ module.exports = knex;
 module.exports.init = init;
 module.exports.getUpcomingFlights = function() {
   var now = moment.utc().format('YYYY-MM-DD HH:mm:ss');
+  debug("getting upcoming flights after", now);
   return knex.
     select('*').
     from('flights').
@@ -34,7 +36,7 @@ module.exports.getUpcomingFlights = function() {
 }
 
 module.exports.getAllFlights = function() {
-  var now = Date.getUtcTimestamp();
+  debug("getting all flights");
   return knex.
     select('*').
     from('flights').

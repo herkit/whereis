@@ -286,8 +286,8 @@ angular
         function(err, flights) {
           if (!err) {
             $scope.flights = flights.map(function(flight) {
-              flight.from.localtime = flight.from.timestamp + (flight.from.timezone.dstOffset || 0) + (flight.from.timezone.rawOffset || 0);
-              flight.to.localtime = flight.to.timestamp + (flight.to.timezone.dstOffset || 0) + (flight.to.timezone.rawOffset || 0);
+              flight.from.utcOffset = timezoneToUtcOffset(flight.from.timezone);
+              flight.to.utcOffset = timezoneToUtcOffset(flight.to.timezone);
               flight.duration = flight.to.timestamp - flight.from.timestamp;
               return flight;
             });
@@ -384,4 +384,14 @@ function LoginDialogController($scope, $mdDialog) {
   $scope.login = function() {
     $mdDialog.hide({ username: $scope.username, password: $scope.password });
   };
+}
+
+function timezoneToUtcOffset(timezone) {
+  var minutes = ((timezone.dstOffset || 0) + (timezone.rawOffset || 0)) / 60;
+  var sign = "+";
+  if (minutes < 0) sign = "-";
+  minutes = Math.abs(minutes);
+  var hh = Math.floor(minutes / 60);
+  var mm = minutes % 60;
+  return sign + ("00" + hh.toString()).slice(-2) + ("00" + mm.toString()).slice(-2);
 }

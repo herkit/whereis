@@ -104,8 +104,10 @@ module.exports = function(app) {
     var placeSearchText = Promise.promisify(gmAPI.placeSearchText, { context: gmAPI });
     var timezone = Promise.promisify(gmAPI.timezone, { context: gmAPI });
 
-    var departure_timestamp = moment.utc(flight.departure);
-    var arrival_timestamp = moment.utc(flight.arrival);
+    var departure_timestamp = moment(flight.departure).utcOffset(0);
+    var arrival_timestamp = moment(flight.arrival).utcOffset(0);
+
+    debug("in data times", flight.departure, flight.arrival);
 
     Promise.all([
       placeSearchText({
@@ -136,21 +138,25 @@ module.exports = function(app) {
     }).
     then((airportdata) => {
       debug(airportdata);
-      departure_timestamp.subtract(airportdata.from.timezone.dstOffset + airportdata.from.timezone.rawOffset, 'seconds');
-      arrival_timestamp.subtract(airportdata.to.timezone.dstOffset + airportdata.to.timezone.rawOffset, 'seconds');
+      var departure_utcOffset = (airportdata.from.timezone.dstOffset + airportdata.from.timezone.rawOffset) / 60;
+      var arrival_utcOffset = (airportdata.to.timezone.dstOffset + airportdata.to.timezone.rawOffset) / 60;
+      var departure_time = moment.parseZone(flight.departure + minutesToOffset(departure_utcOffset));
+      var arrival_time = moment.parseZone(flight.arrival + minutesToOffset(arrival_utcOffset));
+      debug("offsets", departure_utcOffset, arrival_utcOffset);
+      debug("times", flight.departure, departure_time, flight.arrival, arrival_time);
       return {
         from: {
           name: airportdata.from.name,
           code: flight.from,
           location: airportdata.from.geometry.location,
-          time: departure_timestamp.format('YYYY-MM-DD HH:mm:ss'),
+          time: departure_time.utc().format('YYYY-MM-DD HH:mm:ss'),
           timezone: airportdata.from.timezone
         },
         to: {
           name: airportdata.to.name,
           code: flight.to,
           location: airportdata.to.geometry.location,
-          time: arrival_timestamp.format('YYYY-MM-DD HH:mm:ss'),
+          time: arrival_time.utc().format('YYYY-MM-DD HH:mm:ss'),
           timezone: airportdata.to.timezone
         },
         airline: flight.airline,
@@ -213,4 +219,12 @@ module.exports = function(app) {
       })
     }
   );
+}
+
+function minutesToOffset(minutes) {
+  var positive = Math.abs(minutes);
+  var hh = Math.floor(positive / 60);
+  var mm = positive % 60;
+  var sign = (minutes < 0) ? "-" : "+";
+  return sign + ('00' + hh.toString()).slice(-2) + ('00' + mm.toString()).slice(-2);
 }

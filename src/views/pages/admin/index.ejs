@@ -39,15 +39,15 @@
         <div flex="40" class="flightinfo">
           <div class="name">{{flight.from.name}}</div>
           <div class="iata" flex>{{flight.from.code}}</div>
-          <div class="date">{{flight.from.localtime | amFromUnix | amDateFormat:'DD. MMM'}}</div>
-          <div class="time">{{flight.from.localtime | amFromUnix | amDateFormat:'HH:mm'}}</div>
+          <div class="date">{{flight.from.time | amUtc | amUtcOffset:flight.from.utcOffset | amDateFormat:'DD. MMM'}}</div>
+          <div class="time">{{flight.from.time | amUtc | amUtcOffset:flight.from.utcOffset | amDateFormat:'HH:mm'}}</div>
         </div>
         <md-icon class="material-icons rotate90">flight</md-icon>
         <div flex="40" layout="column" class="flightinfo">
           <div class="name">{{flight.to.name}}</div>
           <div class="iata"flex>{{flight.to.code}}</div>
-          <div class="date">{{flight.to.localtime | amFromUnix | amDateFormat:'DD. MMMM'}}</div>
-          <div class="time">{{flight.to.localtime | amFromUnix | amDateFormat:'HH:mm'}}</div>
+          <div class="date">{{flight.to.time | amUtc | amUtcOffset:flight.to.utcOffset | amDateFormat:'DD. MMMM'}}</div>
+          <div class="time">{{flight.to.time | amUtc | amUtcOffset:flight.to.utcOffset | amDateFormat:'HH:mm'}}</div>
         </div>
         <div class="flightinfo" flex="15" hide-xs>
           <div class="time" style="text-align: right">{{ flight.duration | wiTimeSpan }}</div>
