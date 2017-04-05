@@ -63,21 +63,19 @@ module.exports = function(app) {
   });
 
   app.get('/api/settings', isAuthenticated, function(req, res) {
-
-  })
+    res.send({
+      privacymode: statemanager.privacymode
+    })
+  });
 
   app.post('/api/command/:command', isAuthenticated, function(req, res) {
     events.emit('command:' + req.params.command, req.body);
     res.status(200).send({ "result": "Command received", "command": req.params.command, "data": req.body });
-  })
+  });
 
   app.get('/api/flights', isAuthenticated, function(req, res) {
-    db('flights').
-    select('*').
-    orderBy('from_timestamp').
-    map((record) => { 
-      return model.restructure(record); 
-    }).
+    db.
+    getAllFlights().
     then((data) => {
       res.send(data);
     }).
@@ -87,6 +85,18 @@ module.exports = function(app) {
     });
   });
 
+  app.get('/api/flights/upcoming', isAuthenticated, function(req, res) {
+    db.
+    getUpcomingFlights().
+    then((data) => {
+      res.send(data);
+    }).
+    catch((err) => {
+      res.status(404);
+      res.end();
+    });
+  });  
+
   app.post('/api/flights', isAuthenticated, function(req, res) {
     var flight = req.body;
     debug('new flight', flight);
@@ -94,8 +104,8 @@ module.exports = function(app) {
     var placeSearchText = Promise.promisify(gmAPI.placeSearchText, { context: gmAPI });
     var timezone = Promise.promisify(gmAPI.timezone, { context: gmAPI });
 
-    var departure_timestamp = moment(flight.departure).unix();
-    var arrival_timestamp = moment(flight.arrival).unix();
+    var departure_timestamp = moment.utc(flight.departure);
+    var arrival_timestamp = moment.utc(flight.arrival);
 
     Promise.all([
       placeSearchText({
@@ -115,8 +125,8 @@ module.exports = function(app) {
     }).
     then((airportdata) => {
       return Promise.all([
-        timezone({ location: airportdata.from.geometry.location.lat + "," + airportdata.from.geometry.location.lng, timestamp: departure_timestamp }),
-        timezone({ location: airportdata.to.geometry.location.lat + "," + airportdata.to.geometry.location.lng, timestamp: arrival_timestamp })
+        timezone({ location: airportdata.from.geometry.location.lat + "," + airportdata.from.geometry.location.lng, timestamp: departure_timestamp.unix() }),
+        timezone({ location: airportdata.to.geometry.location.lat + "," + airportdata.to.geometry.location.lng, timestamp: arrival_timestamp.unix() })
       ]).
       spread((fromtimezone, totimezone) => {
         airportdata.from.timezone = fromtimezone;
@@ -125,19 +135,22 @@ module.exports = function(app) {
       })
     }).
     then((airportdata) => {
+      debug(airportdata);
+      departure_timestamp.subtract(airportdata.from.timezone.dstOffset + airportdata.from.timezone.rawOffset, 'seconds');
+      arrival_timestamp.subtract(airportdata.to.timezone.dstOffset + airportdata.to.timezone.rawOffset, 'seconds');
       return {
         from: {
           name: airportdata.from.name,
           code: flight.from,
           location: airportdata.from.geometry.location,
-          timestamp: departure_timestamp - (airportdata.from.timezone.dstOffset + airportdata.from.timezone.rawOffset),
+          time: departure_timestamp.format('YYYY-MM-DD HH:mm:ss'),
           timezone: airportdata.from.timezone
         },
         to: {
           name: airportdata.to.name,
           code: flight.to,
           location: airportdata.to.geometry.location,
-          timestamp: arrival_timestamp - (airportdata.to.timezone.dstOffset + airportdata.to.timezone.rawOffset),
+          time: arrival_timestamp.format('YYYY-MM-DD HH:mm:ss'),
           timezone: airportdata.to.timezone
         },
         airline: flight.airline,
@@ -147,7 +160,8 @@ module.exports = function(app) {
     then((flightdata) => {
       flightdata.created_by = req.user.id;
       db.insert(model.flatten(flightdata)).into('flights').returning('id').then(function(record) {
-        flightdata.id = record[0]
+        flightdata.id = record[0];
+        flightdata = db.addFlightTimestampFields(flightdata);
         events.emit('created:flight', flightdata);
         res.status(200).send(flightdata);  
       }).

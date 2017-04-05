@@ -56,7 +56,7 @@ module.exports = {
     var allparts = dateparts.concat(timeparts);
     var date = new Date(Date.UTC.apply(null, allparts));
 
-    position.datetime = date.toISOString();
+    position.datetime = date.toISOString().replace('T', ' ').replace('Z', '');
 
     var m = moment.utc(date);
 

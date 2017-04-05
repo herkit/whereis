@@ -19,7 +19,9 @@ module.exports = {
       } catch(err) {
         debug(err);
         gpstime = new Date().toISOString();
-      }        
+      }
+
+      
 
       var course = qs.heading || qs.bearing || '0';
       var speed = qs.speed || '0';
@@ -27,7 +29,7 @@ module.exports = {
       try {
         var result = {
           raw: up[1],
-          datetime: new Date().toISOString(),
+          datetime: new Date().toISOString().replace('T', ' ').replace('Z', ''),
           id: qs.id || qs.deviceid || null,
           gps: {
             date: gpstime.split("T")[0],

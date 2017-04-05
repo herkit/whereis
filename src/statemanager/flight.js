@@ -2,6 +2,7 @@ var
   events = require('../events'),
   log = require('../lib/log'),
   db = require('../server/db'),
+  moment = require('moment'),
   debug = require('debug')('whereis:statemanager:flight'),
   io = require('../server/client-io');
 
@@ -16,14 +17,18 @@ function init() {
     db('flights').
     select('*').
     where('id', data.id).
+    map(function(record) {
+      return model.restructure(record);
+    }).
+    map(addTimestampFields).
     then((records) => {
-      var flightData = model.restructure(records[0]);
+      var flightData = records[0];
       var flightTime = flightData.to.timestamp - flightData.from.timestamp;
       
       if (flightData.flightnumber)
         flightData.flightnumber = flightData.flightnumber.toUpperCase();
 
-      flightData.from.timestamp = Date.getUtcTimestamp();
+      flightData.from.timestamp = moment().utc().unix();
       flightData.to.timestamp = flightData.from.timestamp + flightTime;
 
       log.debug('command:startflight', flightData);
@@ -43,6 +48,7 @@ function init() {
   getUpcomingFlights().
   then(
     function(flights) {
+      debug("loaded flights:", flights);
       upcomingFlights = 
         flights.
         filter(
@@ -118,5 +124,11 @@ function byFromTime(a, b)
   return 0;
 }
 
+
+function addTimestampFields(flight) {
+  flight.from.timestamp = moment.utc(flight.from.time).unix();
+  flight.to.timestamp = moment.utc(flight.to.time).unix();
+  return flight;
+}
 
 module.exports.init = init;

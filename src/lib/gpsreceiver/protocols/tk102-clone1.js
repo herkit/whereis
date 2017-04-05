@@ -19,7 +19,7 @@ module.exports = {
 
         result = {  
           raw: raw,
-          datetime: '20' + yy + '-' + mm + '-' + dd + 'T' + hh + ':' + nn + ':' + ss,
+          datetime: '20' + yy + '-' + mm + '-' + dd + ' ' + hh + ':' + nn + ':' + ss,
           id: imei,
           gps: {
             date: '20' + yy + '-' + mm + '-' + dd,
