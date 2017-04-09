@@ -30,7 +30,7 @@ whereis.poweredby =
     _:  
       '<div style="font-size:0.9em; cursor: pointer;"> \
       <span style="font-size:0.8em; color:BLACK; cursor: hand; opacity: 0.6; filter: alpha(opacity=60); text-shadow: -2px 0 #FFF, 0 2px #FFF, 2px 0 #FFF, 0 -2px #FFF;">Powered by</span><br/> \
-      <a href="https://linkmobility.de/iot/"><img src="img/wherever.png" alt="whereverSIM" style="height:24px; width: auto" /></a> \
+      <a href="https://linkmobility.de/iot/" target="_blank"><img src="img/wherever.png" alt="whereverSIM" style="height:24px; width: auto" /></a> \
       </div>'
   }
 };
