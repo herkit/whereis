@@ -89,8 +89,8 @@ Date.getUtcTimestamp = function() {
 }
 
 function addFlightTimestampFields(flight) {
-  flight.from.timestamp = moment.utc(flight.from.time).unix();
-  flight.to.timestamp = moment.utc(flight.to.time).unix();
+  flight.from.timestamp = moment(flight.from.time).unix();
+  flight.to.timestamp = moment(flight.to.time).unix();
   return flight;
 }
 

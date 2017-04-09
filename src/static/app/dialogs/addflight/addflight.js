@@ -11,8 +11,8 @@ function AddFlightDialogController($scope, $mdToast, $mdDialog, adminApi) {
       airline: $scope.airline,
       from: $scope.departureAirport.code,
       to: $scope.arrivalAirport.code,
-      departure: $scope.departureTime.toISOString(),
-      arrival: $scope.arrivalTime.toISOString(),
+      departure: moment($scope.departureTime).format('YYYY-MM-DD HH:mm:ss'), 
+      arrival: moment($scope.arrivalTime).format('YYYY-MM-DD HH:mm:ss'),
     }
 
     adminApi.addItinerary(

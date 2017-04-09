@@ -28,8 +28,10 @@ function init() {
       if (flightData.flightnumber)
         flightData.flightnumber = flightData.flightnumber.toUpperCase();
 
-      flightData.from.timestamp = moment().utc().unix();
+      flightData.from.timestamp = Date.getUtcTimestamp();
+      flightData.from.time = moment.utc(flightData.from.timestamp * 1000).format('YYYY-MM-DD HH:mm:ss');
       flightData.to.timestamp = flightData.from.timestamp + flightTime;
+      flightData.from.time = moment.utc(flightData.from.timestamp * 1000 + flightTime).format('YYYY-MM-DD HH:mm:ss');
 
       log.debug('command:startflight', flightData);
       setCurrentFlight(flightData);
