@@ -5,7 +5,7 @@ services:
    - db
   image: "herkit/whereis"
   ports:
-   - "3001"
+   - "3001:3001"
    - "10001-10004:10001-10004"
   env_file:
    - "prod.env"

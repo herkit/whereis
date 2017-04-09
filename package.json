@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --recursive test/specs"
+    "test": "mocha --recursive test/specs",
+    "debug": "node --inspect index.js"
   },
   "author": "",
   "license": "ISC",
