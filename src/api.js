@@ -9,7 +9,8 @@ var cache = require('./lib/geoloccache'),
     model = require('./server/model'),
     events = require('./events'),
     statemanager = require('./statemanager'),
-    IC = require('./lib/iatacodes');
+    IC = require('./lib/iatacodes'),
+    polyUtil = require('polyline-encoded');
 
 var ic = new IC(process.env.IATACODES_API_KEY);
 var GoogleMapsAPI = require('googlemaps');
@@ -180,6 +181,35 @@ module.exports = function(app) {
       debug('error', err);
       res.status(500).send(err);
     })
+  })
+
+  app.get('/api/track/:date', isAuthenticated, function(req, res) {
+    db.getGpsPathForDate(req.params.date).
+    then(function(gpslog) {
+      var latlngs = gpslog.map(function(e) {
+        return [e.geo_latitude, e.geo_longitude]
+      })
+      res.send(polyUtil.encode(latlngs))
+    }).
+    catch(function(err) {
+      debug('Unable to get path', err);
+      res.status('404').send(err);
+    });
+  })
+
+  app.get('/api/track/:date/csv', isAuthenticated, function(req, res) {
+    db.getGpsPathForDate(req.params.date).
+    then(function(gpslog) {
+      res.write("datetime;latitude;longitude;speed_kmh;speed_knots;speed_mph;bearing\r\n");
+      var latlngs = gpslog.forEach(function(e) {       
+        res.write([e.datetime, e.geo_latitude, e.geo_longitude, e.speed_kmh, e.speed_knots, e.speed_mph, e.geo_bearing].join(';') + "\r\n");
+      })
+      res.send();
+    }).
+    catch(function(err) {
+      debug('Unable to get path', err);
+      res.status('404').send(err);
+    });
   })
 
   app.get('/api/flights/getdata', 

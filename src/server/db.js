@@ -83,6 +83,17 @@ module.exports.getGpsLog = function(limit) {
   )
 }
 
+module.exports.getGpsPathForDate = function(date) {
+  var datefrom = moment(date);
+  var dateto = moment(date).add(1, "day");
+  debug("getGpsPathForDate(" + date + ")");
+  debug("datefrom", datefrom, "dateto", dateto);
+  return knex.
+  select(['*']).
+  from('gpslog').
+  whereBetween('datetime', [datefrom.format('YYYY-MM-DD'), dateto.format('YYYY-MM-DD')]);
+}
+
 Date.getUtcTimestamp = function() {
   var now = new Date();
   return Math.floor(now.getTime() / 1000 + now.getTimezoneOffset() * 60);
